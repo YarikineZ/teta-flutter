@@ -116,7 +116,6 @@ class BlackJack {
         stdout.writeln("Неверное значение (1 - Взять, 2 - Пас)");
       }
     }
-    status;
   }
 
   void _dealersTurn() {
@@ -156,7 +155,7 @@ class BlackJack {
   }
 
   void fin() {
-    if ((21 - playerSum) > (21 - dealerSum) || winFlag) {
+    if (((21 - playerSum) > (21 - dealerSum) || winFlag) && dealerSum <= 21) {
       stdout.writeln("Диллер победил");
     } else if (playerSum == dealerSum) {
       stdout.writeln("Ничья");

@@ -60,9 +60,13 @@ class CardDeck {
   }
 
   Card pop() {
-    var first = cards.first;
-    cards.removeAt(0);
-    return (first);
+    if (cards.isNotEmpty) {
+      var first = cards.first;
+      cards.isNotEmpty ? cards.removeAt(0) : null;
+      return (first);
+    } else
+      //TODO Требует написать else чтобы был NullSafety
+      return Card(Suit.clubs, "ERR: DECK IS EMPTY");
   }
 
   void refill() {
@@ -71,93 +75,101 @@ class CardDeck {
     cards.shuffle();
   }
 
-  List get info => List.generate(cards.length, (index) => cards[index].info);
+  List<String> get info =>
+      List.generate(cards.length, (index) => cards[index].info);
 }
 
-class BlackJack {
-  CardDeck deck = CardDeck();
-  List<Card> deallersHand = [];
-  List<Card> playersHand = [];
-  //bool stopFlag = false;
-  int playerSum = 0;
-  int dealerSum = 0;
-  bool winFlag = false;
+abstract class Player {
+  List<Card> hand = [];
+  int scoreSum = 0;
 
-  BlackJack() {
-    newGame();
-    _playersTurn();
-    playerSum <= 21 ? _dealersTurn() : null;
-    fin();
+  void turn(CardDeck deck);
+
+  void status(String prefix) {
+    _calcSum();
+    stdout.writeln("$prefix: $hand, $scoreSum");
   }
 
-  void newGame() {
-    stdout.writeln("Раздача");
-    deck.refill();
-    deallersHand.add(deck.pop());
-    playersHand.add(deck.pop());
-    playersHand.add(deck.pop());
-    status;
+  int _calcSum() {
+    scoreSum = 0;
+    for (final card in hand) {
+      scoreSum += card.value;
+    }
+    for (final card in hand) {
+      if (card.face == "Ace" && scoreSum > 21) scoreSum -= 10;
+    }
+    return scoreSum;
   }
 
-  void _playersTurn() {
+  void addCard(card) {
+    hand.add(card);
+  }
+}
+
+class User extends Player {
+  bool looseFlag = false;
+
+  void turn(CardDeck deck) {
     String? input = "";
-    while (!winFlag) {
+    while (!looseFlag) {
       stdout.writeln("Ход Игрока (1 - Взять, 2 - Пас)");
       input = stdin.readLineSync();
       stdout.writeln();
       if (input == "1") {
-        playersHand.add(deck.pop());
-        _calcSums();
-        status;
-        playerSum > 21 ? winFlag = true : null;
+        hand.add(deck.pop());
+        _calcSum();
+        status("И");
+        scoreSum > 21 ? looseFlag = true : null;
       } else if (input == "2") {
         break;
       } else {
-        stdout.writeln("Неверное значение (1 - Взять, 2 - Пас)");
+        stdout.writeln("Неверное значение");
       }
     }
   }
+}
 
-  void _dealersTurn() {
+class Dealer extends Player {
+  void turn(CardDeck deck) {
+    status("Д");
     stdout.writeln("Ход Диллера");
-    while (dealerSum < 18) {
-      deallersHand.add(deck.pop());
-      status;
+    while (scoreSum < 18) {
+      addCard(deck.pop());
+      status("Д");
     }
   }
+}
 
-  void _calcSums() {
-    playerSum = 0;
-    dealerSum = 0;
-    for (final el in playersHand) {
-      playerSum += el.value;
-    }
+class BlackJack {
+  CardDeck deck = CardDeck();
+  User user = User();
+  Dealer dealer = Dealer();
 
-    for (final el in deallersHand) {
-      dealerSum += el.value;
-    }
-
-    for (final card in playersHand) {
-      if (card.face == "Ace" && playerSum > 21) playerSum -= 10;
-    }
-
-    for (final card in deallersHand) {
-      if (card.face == "Ace" && dealerSum > 21) dealerSum -= 10;
-    }
+  BlackJack() {
+    startDistribution();
+    user.turn(deck);
+    !user.looseFlag ? dealer.turn(deck) : null;
+    fin();
   }
 
-  get status {
-    _calcSums();
-    stdout.writeln("Д: $deallersHand");
-    stdout.writeln("И: $playersHand");
-    stdout.writeln("DealerSum $dealerSum, PlayerSum $playerSum");
-    stdout.writeln("—--------");
+  void startDistribution() {
+    stdout.writeln("\n\nРаздача");
+    deck.refill();
+    dealer.addCard(deck.pop());
+    user.addCard(deck.pop());
+    user.addCard(deck.pop());
+    dealer.status("Д");
+    user.status("И");
   }
 
   void fin() {
-    if (((21 - playerSum) > (21 - dealerSum) || winFlag) && dealerSum <= 21) {
+    stdout.writeln("======");
+    dealer.status("Д");
+    user.status("И");
+    if (((21 - user.scoreSum) > (21 - dealer.scoreSum) || user.looseFlag) &&
+        dealer.scoreSum <= 21) {
       stdout.writeln("Диллер победил");
-    } else if (playerSum == dealerSum) {
+    } else if (user.scoreSum == dealer.scoreSum) {
       stdout.writeln("Ничья");
     } else {
       stdout.writeln("Игрок победил");

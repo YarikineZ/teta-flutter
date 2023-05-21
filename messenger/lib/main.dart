@@ -7,12 +7,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //Чтобы Flutter успел инициализировать fluter channel перед Firebase
 
-  await Firebase.initializeApp(
-      name: "flutter_messenger", //Название проекта в Firebase
+  var firebaseApp = await Firebase.initializeApp(
+      name: "flutter-messenger", //Название проекта в Firebase
       options: DefaultFirebaseOptions.currentPlatform);
 
   final databaseService = DatabaseService();
-  databaseService.getData();
+  databaseService.getData(firebaseApp);
 
   runApp(const MyApp());
 }

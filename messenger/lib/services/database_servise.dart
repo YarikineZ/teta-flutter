@@ -40,7 +40,7 @@ class DatabaseService {
     ref = database.ref();
 
     final message = Message(
-        userId: uuid.toString(),
+        userId: uuid.toString().substring(0, 8),
         text: text,
         timestamp: DateTime.now().millisecondsSinceEpoch.toString());
 

@@ -8,10 +8,12 @@ import '../firebase_options.dart';
 class DatabaseService {
   late DatabaseReference ref;
   late Future<String> uuid;
+  late DatabaseReference abRef;
 
   DatabaseService() {
     init();
     uuid = _getUUID();
+    abRef = FirebaseDatabase.instance.ref("messages");
   }
 
   Future init() async {
@@ -19,6 +21,7 @@ class DatabaseService {
         options: DefaultFirebaseOptions.currentPlatform);
 
     FirebaseDatabase database = FirebaseDatabase.instanceFor(app: firebaseApp);
+
     ref = database.ref();
   }
 
@@ -42,7 +45,7 @@ class DatabaseService {
     final message = Message(
         userId: uuid.toString().substring(0, 8),
         text: text,
-        timestamp: DateTime.now().millisecondsSinceEpoch.toString());
+        timestamp: DateTime.now().millisecondsSinceEpoch);
 
     final messageRef = ref.child("messages").push();
     await messageRef.set(message.toJson());

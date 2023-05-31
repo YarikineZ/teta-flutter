@@ -1,7 +1,7 @@
 ﻿class Message {
   final String userId;
   final String text;
-  final String timestamp;
+  final int timestamp;
 
   Message({required this.userId, required this.text, required this.timestamp});
 

@@ -1,4 +1,3 @@
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:messenger/services/database_servise.dart';
@@ -16,7 +15,6 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -38,16 +36,24 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _controller = TextEditingController();
-  final _abRef = FirebaseDatabase.instance.ref("messages");
+  final _database = DatabaseService();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    _database.init();
+
     var scaffold = Scaffold(
         appBar: AppBar(
           title: const Text("Chat"),
         ),
         body: StreamBuilder(
-            stream: _abRef.onValue,
+            stream: _database.abRef.onValue,
             builder: (context, snapshot) {
               List<Message> messageList = [];
 
@@ -61,6 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   messageList.add(Message.fromMap(currentMessage));
                 });
                 messageList.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
                 return Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: ListView.builder(
@@ -80,9 +87,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 messageList[index].userId)))),
                                     const SizedBox(width: 6),
                                     Text(
-                                      timeago.format(DateTime
-                                          .fromMillisecondsSinceEpoch(int.parse(
-                                              messageList[index].timestamp))),
+                                      timeago.format(
+                                          DateTime.fromMillisecondsSinceEpoch(
+                                              messageList[index].timestamp)),
                                       style: const TextStyle(
                                           fontWeight: FontWeight.w400,
                                           color: Colors.black38,
@@ -102,7 +109,6 @@ class _MyHomePageState extends State<MyHomePage> {
               }
             }),
         bottomSheet: Padding(
-          //padding: MediaQuery.of(context).viewInsets,
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Row(
             children: [
@@ -118,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               IconButton(
                   onPressed: () {
-                    DatabaseService().sendMessage(_controller.text);
+                    _database.sendMessage(_controller.text);
                     _controller.text = "";
                   },
                   icon: const Icon(Icons.send))

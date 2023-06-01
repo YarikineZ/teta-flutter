@@ -40,8 +40,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    _database.init();
-
     var scaffold = Scaffold(
         appBar: AppBar(
           title: const Text("Chat"),

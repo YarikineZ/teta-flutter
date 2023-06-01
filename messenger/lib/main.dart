@@ -9,6 +9,7 @@ import 'package:string_to_hex/string_to_hex.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   runApp(const MyApp());
 }
 
@@ -62,28 +63,16 @@ class MessagesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: _database.abRef.onValue,
+        stream: _database.messagesStream(),
         builder: (context, snapshot) {
-          List<Message> messageList = [];
-
-          if (snapshot.hasData &&
-              snapshot.data != null &&
-              (snapshot.data!).snapshot.value != null) {
-            final firebaseMessages = Map<dynamic, dynamic>.from(
-                (snapshot.data!).snapshot.value as Map<dynamic, dynamic>);
-            firebaseMessages.forEach((key, value) {
-              messageList.add(Message(
-                  text: value["text"],
-                  userId: value["userId"],
-                  timestamp: value["timestamp"]));
-            });
-            messageList.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+          if (snapshot.hasData && snapshot.data != null) {
+            final List<Message>? messageList = snapshot.data;
 
             return Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: ListView.builder(
                     reverse: false,
-                    itemCount: messageList.length,
+                    itemCount: messageList?.length,
                     itemBuilder: (context, index) {
                       return Padding(
                         padding: const EdgeInsets.only(top: 16),
@@ -91,7 +80,7 @@ class MessagesList extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(children: [
-                                Text(messageList[index].userId,
+                                Text(messageList![index].userId,
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: Color(StringToHex.toColor(

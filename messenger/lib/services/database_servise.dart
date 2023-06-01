@@ -50,4 +50,22 @@ class DatabaseService {
     final messageRef = ref.child("messages").push();
     await messageRef.set(message.toJson());
   }
+
+  Stream<List<Message>> messagesStream() => abRef.onValue.map((e) {
+        List<Message> messageList = [];
+
+        final firebaseMessages = Map<dynamic, dynamic>.from(
+            (e).snapshot.value as Map<dynamic, dynamic>);
+
+        firebaseMessages.forEach((key, value) {
+          messageList.add(Message(
+              text: value["text"],
+              userId: value["userId"],
+              timestamp: value["timestamp"]));
+        });
+        messageList.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+        return messageList;
+        // тут параметр e - это сырые данные из бд. Здесь их нужно преобразовать в List<Message> и вернуть
+      });
 }

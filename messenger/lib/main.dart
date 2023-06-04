@@ -23,19 +23,14 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      home: const MyHomePage(),
+      home: MyHomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+class MyHomePage extends StatelessWidget {
+  MyHomePage({super.key});
 
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
   final _database = DatabaseService();
 
   @override
@@ -109,20 +104,26 @@ class MessagesList extends StatelessWidget {
   }
 }
 
-class BottomSheet extends StatelessWidget {
-  final TextEditingController _controller = TextEditingController();
-
+class BottomSheet extends StatefulWidget {
   BottomSheet({
     super.key,
     required DatabaseService database,
   }) : _database = database;
 
+  final DatabaseService _database;
+
+  @override
+  State<BottomSheet> createState() => _BottomSheetState();
+}
+
+class _BottomSheetState extends State<BottomSheet> {
+  final TextEditingController _controller = TextEditingController();
+
   @override
   void dispose() {
+    super.dispose();
     _controller.dispose();
   }
-
-  final DatabaseService _database;
 
   @override
   Widget build(BuildContext context) {
@@ -142,7 +143,7 @@ class BottomSheet extends StatelessWidget {
           ),
           IconButton(
               onPressed: () {
-                _database.sendMessage(_controller.text);
+                widget._database.sendMessage(_controller.text);
                 _controller.text = "";
               },
               icon: const Icon(Icons.send))

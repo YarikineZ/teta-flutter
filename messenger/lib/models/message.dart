@@ -4,6 +4,8 @@
 part 'message.freezed.dart';
 part 'message.g.dart';
 
+// flutter pub run build_runner build
+
 @freezed
 class Message with _$Message {
   const factory Message(
@@ -11,11 +13,6 @@ class Message with _$Message {
       required final String text,
       required final int timestamp}) = _Message;
 
-  factory Message.fromJson(Map<String, Object?> json) =>
+  factory Message.fromJson(Map<String, dynamic> json) =>
       _$MessageFromJson(json);
-
-  // Message.fromMap(Map<String, dynamic> data)
-  //     : userId = data["userId"],
-  //       text = data['text'],
-  //       timestamp = data['timestamp'];
 }

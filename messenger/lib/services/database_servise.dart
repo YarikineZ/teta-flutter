@@ -1,11 +1,12 @@
 ﻿import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:messenger/models/message.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import '../firebase_options.dart';
 
-class DatabaseService {
+class DatabaseService with ChangeNotifier {
   late DatabaseReference ref;
   late String uuid;
   late DatabaseReference abRef;

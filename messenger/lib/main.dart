@@ -5,12 +5,20 @@ import 'firebase_options.dart';
 import 'models/message.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:string_to_hex/string_to_hex.dart';
+import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => DatabaseService()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -23,7 +31,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      home: MyHomePage(),
+      home: const MyHomePage(),
     );
   }
 }
@@ -36,16 +44,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final _database = DatabaseService();
-
   @override
   Widget build(BuildContext context) {
     var scaffold = Scaffold(
         appBar: AppBar(
           title: const Text("Chat"),
         ),
-        body: MessagesList(database: _database),
-        bottomSheet: BottomSheet(database: _database));
+        body: const MessagesList(),
+        bottomSheet: const BottomSheet());
     return scaffold;
   }
 }
@@ -53,15 +59,14 @@ class _MyHomePageState extends State<MyHomePage> {
 class MessagesList extends StatelessWidget {
   const MessagesList({
     super.key,
-    required DatabaseService database,
-  }) : _database = database;
-
-  final DatabaseService _database;
+  });
 
   @override
   Widget build(BuildContext context) {
+    final DatabaseService database = context.read<DatabaseService>();
+
     return StreamBuilder(
-        stream: _database.messagesStream(),
+        stream: database.messagesStream(),
         builder: (context, snapshot) {
           if (snapshot.hasData && snapshot.data != null) {
             final List<Message>? messageList = snapshot.data;
@@ -110,12 +115,9 @@ class MessagesList extends StatelessWidget {
 }
 
 class BottomSheet extends StatefulWidget {
-  BottomSheet({
+  const BottomSheet({
     super.key,
-    required DatabaseService database,
-  }) : _database = database;
-
-  final DatabaseService _database;
+  });
 
   @override
   State<BottomSheet> createState() => _BottomSheetState();
@@ -132,6 +134,8 @@ class _BottomSheetState extends State<BottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final DatabaseService database = context.read<DatabaseService>();
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Row(
@@ -148,7 +152,7 @@ class _BottomSheetState extends State<BottomSheet> {
           ),
           IconButton(
               onPressed: () {
-                widget._database.sendMessage(_controller.text);
+                database.sendMessage(_controller.text);
                 _controller.text = "";
               },
               icon: const Icon(Icons.send))

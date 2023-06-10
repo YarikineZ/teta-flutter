@@ -4,24 +4,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:messenger/models/message.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
-import '../firebase_options.dart';
 
 class DatabaseService with ChangeNotifier {
-  late DatabaseReference ref;
   late String uuid;
-  late DatabaseReference abRef;
+  late DatabaseReference messagesRef;
 
-  DatabaseService() {
-    init();
-    abRef = FirebaseDatabase.instance.ref("messages");
-  }
+  DatabaseService();
 
-  Future init() async {
-    var firebaseApp = await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform);
-
+  Future init(FirebaseApp firebaseApp) async {
     FirebaseDatabase database = FirebaseDatabase.instanceFor(app: firebaseApp);
-    ref = database.ref();
+    messagesRef = database.ref('messages');
 
     uuid = await _getUUID();
   }
@@ -39,38 +31,27 @@ class DatabaseService with ChangeNotifier {
   }
 
   Future sendMessage(text) async {
-    FirebaseDatabase database = FirebaseDatabase.instance;
-
-    ref = database.ref();
-
     final message = Message(
         userId: uuid.substring(0, 8),
         text: text,
         timestamp: DateTime.now().millisecondsSinceEpoch);
 
-    final messageRef = ref.child("messages").push();
+    final messageRef = messagesRef.push();
     await messageRef.set(message.toJson());
   }
 
-  Stream<List<Message>> messagesStream() => abRef.onValue.map((e) {
+  Stream<List<Message>> messagesStream() => messagesRef.onValue.map((e) {
         List<Message> messageList = [];
 
         final firebaseMessages = Map<dynamic, dynamic>.from(
-            (e).snapshot.value as Map<dynamic, dynamic>);
-
-        // firebaseMessages.forEach((key, value) {
-        //   messageList.add(Message.fromJson(value));
-        // });
+            e.snapshot.value as Map<dynamic, dynamic>);
 
         firebaseMessages.forEach((key, value) {
-          messageList.add(Message(
-              text: value["text"],
-              userId: value["userId"],
-              timestamp: value["timestamp"]));
+          final currentMessage = Map<String, dynamic>.from(value);
+          messageList.add(Message.fromJson(currentMessage));
         });
-        messageList.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
+        messageList.sort((a, b) => a.timestamp.compareTo(b.timestamp));
         return messageList;
-        // тут параметр e - это сырые данные из бд. Здесь их нужно преобразовать в List<Message> и вернуть
       });
 }

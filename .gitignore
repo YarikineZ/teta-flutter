@@ -1,2 +1,4 @@
 
 *.gradle
+messenger/android/build.gradle
+messenger/pubspec.lock

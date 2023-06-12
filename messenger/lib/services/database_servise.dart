@@ -3,21 +3,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:messenger/models/message.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
 
 class DatabaseService with ChangeNotifier {
-  late String uuid;
   late DatabaseReference messagesRef;
-  late final SharedPreferences prefs;
-
-  //DatabaseService();
 
   Future init(FirebaseApp firebaseApp) async {
     FirebaseDatabase database = FirebaseDatabase.instanceFor(app: firebaseApp);
     messagesRef = database.ref('messages');
-    prefs = await SharedPreferences.getInstance();
-
-    uuid = await _getUUID();
   }
 
   Future<void> _setNewName(String name) async {
@@ -25,20 +17,10 @@ class DatabaseService with ChangeNotifier {
     await prefs.setString("name", name);
   }
 
-  Future<String> _getUUID() async {
-    final String? oldUuid = prefs.getString('uuid');
-    if (oldUuid != null) {
-      return oldUuid;
-    } else {
-      String newUuid = const Uuid().v4();
-      await prefs.setString("uuid", newUuid);
-      return newUuid;
-    }
-  }
-
-  Future sendMessage(text) async {
+  Future sendMessage(userId, text) async {
     final message = Message(
-        userId: uuid.substring(0, 8),
+        //userId: uuid.substring(0, 8),
+        userId: userId.substring(0, 8),
         text: text,
         timestamp: DateTime.now().millisecondsSinceEpoch);
 

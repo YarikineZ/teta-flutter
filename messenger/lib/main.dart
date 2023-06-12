@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:messenger/pages/chat_page.dart';
 import 'package:messenger/pages/chats_list_page.dart';
 import 'package:messenger/pages/contacts_page.dart';
 import 'package:messenger/pages/settings_page.dart';
 import 'package:messenger/services/database_servise.dart';
+import 'package:messenger/services/storage_servise.dart';
+
 import 'firebase_options.dart';
 
 import 'package:provider/provider.dart';
@@ -13,6 +16,8 @@ Future<void> main() async {
   final firebaseApp = await Firebase.initializeApp(
       name: 'aaa', options: DefaultFirebaseOptions.currentPlatform);
 
+  final storage = StorageService();
+  await storage.init();
   final database = DatabaseService();
   await database.init(firebaseApp);
 
@@ -20,6 +25,7 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => database),
+        ChangeNotifierProvider(create: (context) => storage),
       ],
       child: const MyApp(),
     ),
@@ -52,7 +58,8 @@ class ALL extends StatefulWidget {
 class _ALLState extends State<ALL> {
   int _selectedIndex = 0;
   static const List<Widget> _widgetOptions = <Widget>[
-    ContactsPage(),
+    //ContactsPage(),
+    MessagesList(), //TODO Change to contacts page
     ChatsPage(),
     SettingsPage(),
   ];

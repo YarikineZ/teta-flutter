@@ -1,4 +1,6 @@
-﻿import '../models/message.dart';
+﻿import 'package:messenger/services/storage_servise.dart';
+
+import '../models/message.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:string_to_hex/string_to_hex.dart';
 import 'package:flutter/material.dart';
@@ -120,6 +122,7 @@ class _BottomSheetState extends State<BottomSheet> {
   @override
   Widget build(BuildContext context) {
     final DatabaseService database = context.read<DatabaseService>();
+    final StorageService storageService = context.read<StorageService>();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -138,7 +141,8 @@ class _BottomSheetState extends State<BottomSheet> {
           ),
           IconButton(
             onPressed: () {
-              database.sendMessage(_controller.text);
+              database.sendMessage(storageService.uuid,
+                  _controller.text); //TODO сделать через гетер
               _controller.text = "";
             },
             icon: const Icon(Icons.send),

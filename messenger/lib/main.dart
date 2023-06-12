@@ -58,8 +58,7 @@ class ALL extends StatefulWidget {
 class _ALLState extends State<ALL> {
   int _selectedIndex = 0;
   static const List<Widget> _widgetOptions = <Widget>[
-    //ContactsPage(),
-    MessagesList(), //TODO Change to contacts page
+    ContactsPage(),
     ChatsPage(),
     SettingsPage(),
   ];

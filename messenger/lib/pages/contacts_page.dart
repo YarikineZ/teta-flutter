@@ -12,8 +12,8 @@ class _ContactsPageState extends State<ContactsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Contacts")),
-      body: ListView(children: [
+      appBar: AppBar(title: const Text("Contacts")),
+      body: ListView(children: const [
         Divider(height: 0),
         ListTile(
           leading: CircleAvatar(child: Text('B')),

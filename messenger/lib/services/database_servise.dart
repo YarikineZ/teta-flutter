@@ -8,18 +8,24 @@ import 'package:uuid/uuid.dart';
 class DatabaseService with ChangeNotifier {
   late String uuid;
   late DatabaseReference messagesRef;
+  late final SharedPreferences prefs;
 
-  DatabaseService();
+  //DatabaseService();
 
   Future init(FirebaseApp firebaseApp) async {
     FirebaseDatabase database = FirebaseDatabase.instanceFor(app: firebaseApp);
     messagesRef = database.ref('messages');
+    prefs = await SharedPreferences.getInstance();
 
     uuid = await _getUUID();
   }
 
-  Future<String> _getUUID() async {
+  Future<void> _setNewName(String name) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString("name", name);
+  }
+
+  Future<String> _getUUID() async {
     final String? oldUuid = prefs.getString('uuid');
     if (oldUuid != null) {
       return oldUuid;

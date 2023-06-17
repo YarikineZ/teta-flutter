@@ -5,7 +5,9 @@ import 'package:messenger/pages/chats_list_page.dart';
 import 'package:messenger/pages/contacts_page.dart';
 import 'package:messenger/pages/settings_page.dart';
 import 'package:messenger/services/database_servise.dart';
+import 'package:messenger/services/shared_preferences_service.dart';
 import 'package:messenger/services/storage_servise.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'firebase_options.dart';
 
@@ -16,16 +18,19 @@ Future<void> main() async {
   final firebaseApp = await Firebase.initializeApp(
       name: 'aaa', options: DefaultFirebaseOptions.currentPlatform);
 
-  final storage = StorageService();
-  await storage.init();
+  final sharedPreferences = SharedPreferencesService();
+  await sharedPreferences.init();
   final database = DatabaseService();
   await database.init(firebaseApp);
+  final storage = StorageService();
+  await storage.init(firebaseApp);
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => database),
         ChangeNotifierProvider(create: (context) => storage),
+        ChangeNotifierProvider(create: (context) => sharedPreferences),
       ],
       child: const MyApp(),
     ),

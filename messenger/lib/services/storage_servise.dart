@@ -1,45 +1,23 @@
-﻿import 'package:flutter/cupertino.dart';
-//import 'package:messenger/models/user.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
+﻿import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
+
+//flutterfire configure
 
 class StorageService with ChangeNotifier {
-  //late User user;
-  late String uuid;
-  late String name;
-  late final SharedPreferences prefs;
+  late Reference imagesRef;
 
-  Future init() async {
-    prefs = await SharedPreferences.getInstance();
-    // user.uuid = await _getUUID();
-    // user.name = await _getName();
-    uuid = await _getUUID();
-    name = await _getName();
+  Future init(FirebaseApp firebaseApp) async {
+    imagesRef = FirebaseStorage.instance.ref().child("images");
   }
 
-  Future<void> saveNewName(String newName) async {
-    name = newName;
-    await prefs.setString("name", name);
-  }
-
-  Future<String> _getName() async {
-    final String? name = prefs.getString('name');
-    if (name != null) {
-      return name;
-    } else {
-      print("USER NAME IS NULL");
-      return "No user name";
-    }
-  }
-
-  Future<String> _getUUID() async {
-    final String? oldUuid = prefs.getString('uuid');
-    if (oldUuid != null) {
-      return oldUuid;
-    } else {
-      String newUuid = const Uuid().v4();
-      await prefs.setString("uuid", newUuid);
-      return newUuid;
-    }
+  Future<String> pushImage(String imageName, String imagePath) async {
+    Reference ref = imagesRef.child(imageName);
+    var imageFile = File(imagePath);
+    await ref.putFile(imageFile);
+    final downloadURL = await ref.getDownloadURL();
+    return downloadURL;
   }
 }

@@ -1,7 +1,9 @@
-﻿import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:messenger/services/storage_servise.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:messenger/services/shared_preferences_service.dart';
 import 'package:provider/provider.dart';
+
+import '../services/storage_servise.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -20,11 +22,21 @@ class _SettingsPageState extends State<SettingsPage> {
     });
   }
 
-  void _done(storage) {
+  void _done(sharedPreferences) {
     setState(() {
       _isEdit = false;
-      storage.saveNewName(_controller.text);
+      sharedPreferences.saveNewName(_controller.text);
     });
+  }
+
+  void pickImage(StorageService storage,
+      SharedPreferencesService sharedPreferences) async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      String downloadURL = await storage.pushImage(image.name, image.path);
+      sharedPreferences.setAvatarURL(downloadURL);
+    }
   }
 
   @override
@@ -35,6 +47,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final SharedPreferencesService sharedPreferences =
+        context.read<SharedPreferencesService>(); //context.read??
     final StorageService storage = context.read<StorageService>();
 
     return Scaffold(
@@ -43,7 +57,8 @@ class _SettingsPageState extends State<SettingsPage> {
         actions: [
           _isEdit
               ? TextButton(
-                  onPressed: () => _done(storage), child: const Text("Done"))
+                  onPressed: () => _done(sharedPreferences),
+                  child: const Text("Done"))
               : TextButton(onPressed: _edit, child: const Text("Edit"))
         ],
       ),
@@ -51,9 +66,13 @@ class _SettingsPageState extends State<SettingsPage> {
         width: MediaQuery.of(context).size.width,
         child: Column(
           children: [
-            const CircleAvatar(
-              child: Icon(Icons.face),
-              radius: 32,
+            GestureDetector(
+              onTap: () => pickImage(storage, sharedPreferences),
+              child: CircleAvatar(
+                radius: 32,
+                child: Image.network(
+                    sharedPreferences.avatarURL), //TODO make background image
+              ),
             ),
             const SizedBox(height: 32.0),
             _isEdit
@@ -63,7 +82,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       controller: _controller,
                       decoration: InputDecoration(labelText: 'Enter Your name'),
                     ))
-                : Text(storage.name)
+                : Text(sharedPreferences.name)
           ],
         ),
       ),

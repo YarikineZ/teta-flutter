@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:messenger/models/message.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+//flutterfire configure
+
 class DatabaseService with ChangeNotifier {
   late DatabaseReference messagesRef;
 

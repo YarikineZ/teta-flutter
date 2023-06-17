@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+
 import 'package:messenger/pages/chat_page.dart';
 import 'package:messenger/pages/chats_list_page.dart';
 import 'package:messenger/pages/contacts_page.dart';
 import 'package:messenger/pages/settings_page.dart';
+
 import 'package:messenger/services/database_servise.dart';
 import 'package:messenger/services/shared_preferences_service.dart';
 import 'package:messenger/services/storage_servise.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'firebase_options.dart';
 

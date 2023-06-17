@@ -16,13 +16,19 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _isEdit = false;
   final TextEditingController _controller = TextEditingController();
 
-  void _edit() {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void _edit(SharedPreferencesService sharedPreferences) {
     setState(() {
       _isEdit = true;
+      _controller.text = sharedPreferences.name;
     });
   }
 
-  void _done(sharedPreferences) {
+  void _done(SharedPreferencesService sharedPreferences) {
     setState(() {
       _isEdit = false;
       sharedPreferences.saveNewName(_controller.text);
@@ -59,7 +65,9 @@ class _SettingsPageState extends State<SettingsPage> {
               ? TextButton(
                   onPressed: () => _done(sharedPreferences),
                   child: const Text("Done"))
-              : TextButton(onPressed: _edit, child: const Text("Edit"))
+              : TextButton(
+                  onPressed: () => _edit(sharedPreferences),
+                  child: const Text("Edit"))
         ],
       ),
       body: Container(
@@ -69,10 +77,9 @@ class _SettingsPageState extends State<SettingsPage> {
             GestureDetector(
               onTap: () => pickImage(storage, sharedPreferences),
               child: CircleAvatar(
-                radius: 32,
-                child: Image.network(
-                    sharedPreferences.avatarURL), //TODO make background image
-              ),
+                  radius: 32,
+                  child: Image.network(sharedPreferences
+                      .avatarURL)), //TODO make background image
             ),
             const SizedBox(height: 32.0),
             _isEdit

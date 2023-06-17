@@ -1,4 +1,4 @@
-﻿import 'package:messenger/services/storage_servise.dart';
+﻿import 'package:messenger/services/shared_preferences_service.dart';
 
 import '../models/message.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -122,7 +122,8 @@ class _BottomSheetState extends State<BottomSheet> {
   @override
   Widget build(BuildContext context) {
     final DatabaseService database = context.read<DatabaseService>();
-    final StorageService storageService = context.read<StorageService>();
+    final SharedPreferencesService sharedPreferences =
+        context.read<SharedPreferencesService>();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -141,8 +142,7 @@ class _BottomSheetState extends State<BottomSheet> {
           ),
           IconButton(
             onPressed: () {
-              database.sendMessage(storageService.uuid,
-                  _controller.text); //TODO сделать через гетер
+              database.sendMessage(sharedPreferences.uuid, _controller.text);
               _controller.text = "";
             },
             icon: const Icon(Icons.send),

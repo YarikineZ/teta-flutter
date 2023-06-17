@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:messenger/services/shared_preferences_service.dart';
 import 'package:provider/provider.dart';
 
+import '../services/database_servise.dart';
 import '../services/storage_servise.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -28,20 +29,27 @@ class _SettingsPageState extends State<SettingsPage> {
     });
   }
 
-  void _done(SharedPreferencesService sharedPreferences) {
+  void _done(
+      SharedPreferencesService sharedPreferences, DatabaseService database) {
     setState(() {
       _isEdit = false;
       sharedPreferences.saveNewName(_controller.text);
+      database.updateUser(sharedPreferences.uuid, _controller.text,
+          sharedPreferences.avatarURL);
     });
   }
 
-  void pickImage(StorageService storage,
-      SharedPreferencesService sharedPreferences) async {
+  void pickImage(
+      StorageService storage,
+      SharedPreferencesService sharedPreferences,
+      DatabaseService database) async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
       String downloadURL = await storage.pushImage(image.name, image.path);
       sharedPreferences.setAvatarURL(downloadURL);
+      database.updateUser(
+          sharedPreferences.uuid, sharedPreferences.name, downloadURL);
     }
   }
 
@@ -56,6 +64,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final SharedPreferencesService sharedPreferences =
         context.read<SharedPreferencesService>(); //context.read??
     final StorageService storage = context.read<StorageService>();
+    final DatabaseService database = context.read<DatabaseService>();
 
     return Scaffold(
       appBar: AppBar(
@@ -63,7 +72,7 @@ class _SettingsPageState extends State<SettingsPage> {
         actions: [
           _isEdit
               ? TextButton(
-                  onPressed: () => _done(sharedPreferences),
+                  onPressed: () => _done(sharedPreferences, database),
                   child: const Text("Done"))
               : TextButton(
                   onPressed: () => _edit(sharedPreferences),
@@ -75,7 +84,7 @@ class _SettingsPageState extends State<SettingsPage> {
         child: Column(
           children: [
             GestureDetector(
-              onTap: () => pickImage(storage, sharedPreferences),
+              onTap: () => pickImage(storage, sharedPreferences, database),
               child: CircleAvatar(
                   radius: 32,
                   child: Image.network(sharedPreferences

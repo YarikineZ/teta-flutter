@@ -2,37 +2,24 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:messenger/models/message.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
+import 'package:messenger/models/user.dart';
+
+//flutterfire configure
 
 class DatabaseService with ChangeNotifier {
-  late String uuid;
   late DatabaseReference messagesRef;
-
-  DatabaseService();
+  late DatabaseReference usersRef;
 
   Future init(FirebaseApp firebaseApp) async {
     FirebaseDatabase database = FirebaseDatabase.instanceFor(app: firebaseApp);
     messagesRef = database.ref('messages');
-
-    uuid = await _getUUID();
+    usersRef = database.ref('users');
   }
 
-  Future<String> _getUUID() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String? oldUuid = prefs.getString('uuid');
-    if (oldUuid != null) {
-      return oldUuid;
-    } else {
-      String newUuid = const Uuid().v4();
-      await prefs.setString("uuid", newUuid);
-      return newUuid;
-    }
-  }
-
-  Future sendMessage(text) async {
+  Future sendMessage(userId, text) async {
     final message = Message(
-        userId: uuid.substring(0, 8),
+        //userId: uuid.substring(0, 8),
+        userId: userId.substring(0, 8),
         text: text,
         timestamp: DateTime.now().millisecondsSinceEpoch);
 
@@ -54,4 +41,31 @@ class DatabaseService with ChangeNotifier {
         messageList.sort((a, b) => a.timestamp.compareTo(b.timestamp));
         return messageList;
       });
+
+  Future updateUser(userId, name, photoURL) async {
+    final user = User(id: userId, displayName: name, photoURL: photoURL);
+    await usersRef.child(userId).set(user.toJson());
+  }
+
+  Future<List<User>> getUsers() async {
+    List<User> users = [];
+    var snapshot = await usersRef.get();
+
+    final firebaseUsers =
+        Map<dynamic, dynamic>.from(snapshot.value as Map<dynamic, dynamic>);
+
+    firebaseUsers.forEach((key, value) {
+      final currentUser = Map<String, dynamic>.from(value);
+      users.add(User.fromJson(currentUser));
+    });
+
+    return users;
+  }
 }
+// Создать модель User c полями
+// id
+// displayName
+// photoUrl
+// При изменении имени сохранять значение в Firebase /users/id/displayName
+// При изменении фото сохранять значение URL в /users/id/photoUrl
+// Загружать и выводить список всех /users на странице контактов

@@ -1,6 +1,4 @@
-﻿import 'dart:js_interop';
-
-import 'package:messenger/services/shared_preferences_service.dart';
+﻿import 'package:messenger/services/shared_preferences_service.dart';
 
 import '../models/message.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -65,9 +63,9 @@ class MessagesList extends StatelessWidget {
 }
 
 class MessageWidget extends StatelessWidget {
-  Message message;
+  final Message message;
 
-  MessageWidget({super.key, required this.message});
+  const MessageWidget({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,3 @@
-import 'dart:js_interop';
-
 import 'package:flutter/material.dart';
 import 'package:messenger/models/message.dart';
 import 'package:messenger/pages/chat_page.dart';

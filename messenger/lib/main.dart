@@ -47,6 +47,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         colorSchemeSeed: Colors.green,
+        fontFamily: 'TimesNewRoman',
         useMaterial3: true,
       ),
       home: const ALL(),

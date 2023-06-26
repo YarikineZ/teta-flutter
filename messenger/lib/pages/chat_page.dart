@@ -22,7 +22,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: const Text("Chat"),
       ),
       body: const MessagesList(),
-      bottomSheet: const BottomSheet(),
+      bottomSheet: const MyBottomSheet(),
     );
     return scaffold;
   }
@@ -49,46 +49,7 @@ class MessagesList extends StatelessWidget {
                 reverse: false,
                 itemCount: messageList?.length,
                 itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(children: [
-                          Text(
-                            messageList![index].userId,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Color(
-                                StringToHex.toColor(
-                                  messageList[index].userId,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            timeago.format(
-                              DateTime.fromMillisecondsSinceEpoch(
-                                messageList[index].timestamp,
-                              ),
-                            ),
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w400,
-                                color: Colors.black38,
-                                fontSize: 13.0),
-                          )
-                        ]),
-                        const SizedBox(
-                          height: 8,
-                        ),
-                        Text(
-                          messageList[index].text,
-                          style: const TextStyle(fontSize: 16.0),
-                        )
-                      ],
-                    ),
-                  );
+                  return MessageWidget(message: messageList![index]);
                 },
               ),
             );
@@ -101,16 +62,66 @@ class MessagesList extends StatelessWidget {
   }
 }
 
-class BottomSheet extends StatefulWidget {
-  const BottomSheet({
+class MessageWidget extends StatelessWidget {
+  final Message message;
+
+  const MessageWidget({super.key, required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            Text(
+              message.userId,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color(
+                  StringToHex.toColor(
+                    message.userId,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              timeago.format(
+                DateTime.fromMillisecondsSinceEpoch(
+                  message.timestamp,
+                ),
+              ),
+              style: const TextStyle(
+                  fontWeight: FontWeight.w400,
+                  color: Colors.black38,
+                  fontSize: 13.0),
+            )
+          ]),
+          const SizedBox(
+            height: 8,
+          ),
+          Text(
+            message.text,
+            style: const TextStyle(fontSize: 16.0),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class MyBottomSheet extends StatefulWidget {
+  const MyBottomSheet({
     super.key,
   });
 
   @override
-  State<BottomSheet> createState() => _BottomSheetState();
+  State<MyBottomSheet> createState() => _MyBottomSheetState();
 }
 
-class _BottomSheetState extends State<BottomSheet> {
+class _MyBottomSheetState extends State<MyBottomSheet> {
   final TextEditingController _controller = TextEditingController();
 
   @override

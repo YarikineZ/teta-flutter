@@ -7,14 +7,14 @@ import 'package:string_to_hex/string_to_hex.dart';
 import 'package:flutter/material.dart';
 import 'package:messenger/services/database_servise.dart';
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+class ChatPage extends StatefulWidget {
+  const ChatPage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<ChatPage> createState() => _ChatPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     var scaffold = Scaffold(

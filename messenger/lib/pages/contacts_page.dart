@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 
 import '../models/user.dart';
 import '../services/database_servise.dart';
+import 'chat_page.dart';
 
 class ContactsPage extends StatefulWidget {
   const ContactsPage({super.key});
@@ -56,6 +57,10 @@ class UserCardWidget extends StatelessWidget {
         ListTile(
           leading: CircleAvatar(child: Text(user.displayName![0])),
           title: Text(user.displayName!),
+          onTap: () {
+            Navigator.of(context).push(
+                CupertinoPageRoute(builder: ((context) => const ChatPage())));
+          },
         ),
       ],
     );

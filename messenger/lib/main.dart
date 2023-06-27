@@ -12,7 +12,9 @@ import 'package:messenger/services/storage_servise.dart';
 
 import 'firebase_options.dart';
 
-import 'package:provider/provider.dart';
+import 'package:get_it/get_it.dart';
+
+GetIt getIt = GetIt.instance;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,16 +28,13 @@ Future<void> main() async {
   final storage = StorageService();
   await storage.init(firebaseApp);
 
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => database),
-        ChangeNotifierProvider(create: (context) => storage),
-        ChangeNotifierProvider(create: (context) => sharedPreferences),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  final getIt = GetIt.instance;
+
+  getIt.registerSingleton<SharedPreferencesService>(sharedPreferences);
+  getIt.registerSingleton<DatabaseService>(database);
+  getIt.registerSingleton<StorageService>(storage);
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {

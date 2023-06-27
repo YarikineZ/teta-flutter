@@ -2,6 +2,7 @@
 import 'package:image_picker/image_picker.dart';
 import 'package:messenger/services/shared_preferences_service.dart';
 import 'package:get_it/get_it.dart';
+import 'package:messenger/widgets/web_view_widget.dart';
 
 import '../services/database_servise.dart';
 import '../services/storage_servise.dart';
@@ -98,7 +99,16 @@ class _SettingsPageState extends State<SettingsPage> {
                       controller: _controller,
                       decoration: InputDecoration(labelText: 'Enter Your name'),
                     ))
-                : Text(sharedPreferences.name)
+                : Text(sharedPreferences.name),
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const WebViewContainer()));
+              },
+              child: const Text("WebView"),
+            ),
           ],
         ),
       ),

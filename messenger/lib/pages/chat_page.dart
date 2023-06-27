@@ -8,7 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:messenger/services/database_servise.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({super.key});
+  final String pageTitle;
+  const ChatPage({super.key, required this.pageTitle});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -19,7 +20,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     var scaffold = Scaffold(
       appBar: AppBar(
-        title: const Text("Chat"),
+        title: Text(widget.pageTitle),
       ),
       body: const MessagesList(),
       bottomSheet: const MyBottomSheet(),

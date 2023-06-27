@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-import 'package:messenger/pages/chat_page.dart';
 import 'package:messenger/pages/chats_list_page.dart';
 import 'package:messenger/pages/contacts_page.dart';
 import 'package:messenger/pages/settings_page.dart';

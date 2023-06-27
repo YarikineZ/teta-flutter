@@ -46,8 +46,8 @@ class _ContactsPageState extends State<ContactsPage> {
 }
 
 class UserCardWidget extends StatelessWidget {
-  User user;
-  UserCardWidget({super.key, required this.user});
+  final User user;
+  const UserCardWidget({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -58,8 +58,9 @@ class UserCardWidget extends StatelessWidget {
           leading: CircleAvatar(child: Text(user.displayName![0])),
           title: Text(user.displayName!),
           onTap: () {
-            Navigator.of(context).push(
-                CupertinoPageRoute(builder: ((context) => const ChatPage())));
+            Navigator.of(context).push(CupertinoPageRoute(
+                builder: ((context) =>
+                    ChatPage(pageTitle: user.displayName!))));
           },
         ),
       ],

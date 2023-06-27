@@ -1,5 +1,9 @@
 ﻿import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+
+import '../models/user.dart';
+import '../services/database_servise.dart';
 
 class ContactsPage extends StatefulWidget {
   const ContactsPage({super.key});
@@ -11,27 +15,49 @@ class ContactsPage extends StatefulWidget {
 class _ContactsPageState extends State<ContactsPage> {
   @override
   Widget build(BuildContext context) {
+    final DatabaseService database = GetIt.I.get<DatabaseService>();
+
     return Scaffold(
-      appBar: AppBar(title: const Text("Contacts")),
-      body: ListView(children: const [
-        Divider(height: 0),
+        appBar: AppBar(title: const Text("Contacts")),
+        body: StreamBuilder(
+            stream: database.usersStream(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData && snapshot.data != null) {
+                final List<User>? usersList = snapshot.data;
+
+                return Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ListView.builder(
+                    reverse: false,
+                    itemCount: usersList?.length,
+                    itemBuilder: (context, index) {
+                      return UserCardWidget(user: usersList![index]);
+                    },
+                  ),
+                );
+              } else {
+                return const Center(
+                  child: Text("No users in DB"),
+                );
+              }
+            }));
+  }
+}
+
+class UserCardWidget extends StatelessWidget {
+  User user;
+  UserCardWidget({super.key, required this.user});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const Divider(height: 0),
         ListTile(
-          leading: CircleAvatar(child: Text('B')),
-          title: Text('Headline'),
-          subtitle: Text(
-              'Longer supporting text to demonstrate how the text wraps and how the leading and trailing widgets are centered vertically with the text.'),
-          trailing: Icon(Icons.favorite_rounded),
+          leading: CircleAvatar(child: Text(user.displayName![0])),
+          title: Text(user.displayName!),
         ),
-        Divider(height: 0),
-        ListTile(
-          leading: CircleAvatar(child: Text('C')),
-          title: Text('Headline'),
-          subtitle: Text(
-              "Longer supporting text to demonstrate how the text wraps and how setting 'ListTile.isThreeLine = true' aligns leading and trailing widgets to the top vertically with the text."),
-          trailing: Icon(Icons.favorite_rounded),
-          isThreeLine: true,
-        )
-      ]),
+      ],
     );
   }
 }

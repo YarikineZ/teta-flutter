@@ -125,10 +125,20 @@ class MyBottomSheet extends StatefulWidget {
 class _MyBottomSheetState extends State<MyBottomSheet> {
   final TextEditingController _controller = TextEditingController();
 
+  late FocusNode myFocusNode;
+
+  @override
+  void initState() {
+    super.initState();
+
+    myFocusNode = FocusNode();
+  }
+
   @override
   void dispose() {
     super.dispose();
     _controller.dispose();
+    myFocusNode.dispose();
   }
 
   @override
@@ -144,6 +154,7 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
           Expanded(
             child: TextField(
               controller: _controller,
+              focusNode: myFocusNode,
               style: const TextStyle(fontSize: 16.0),
               decoration: const InputDecoration(
                 labelText: "Message",
@@ -152,12 +163,19 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
               ),
             ),
           ),
-          IconButton(
-            onPressed: () {
-              database.sendMessage(sharedPreferences.uuid, _controller.text);
-              _controller.text = "";
-            },
-            icon: const Icon(Icons.send),
+          AnimatedSwitcher(
+            duration: Duration(microseconds: 50),
+            child: IconButton(
+              onPressed: () {
+                myFocusNode.unfocus();
+                _controller.text.isNotEmpty || _controller.text != ""
+                    ? database.sendMessage(
+                        sharedPreferences.uuid, _controller.text)
+                    : null;
+                _controller.text = "";
+              },
+              icon: const Icon(Icons.send),
+            ),
           )
         ],
       ),

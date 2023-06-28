@@ -124,14 +124,15 @@ class MyBottomSheet extends StatefulWidget {
 
 class _MyBottomSheetState extends State<MyBottomSheet> {
   final TextEditingController _controller = TextEditingController();
-
-  late FocusNode myFocusNode;
+  final FocusNode myFocusNode = FocusNode();
+  late Widget animatedIcon;
 
   @override
   void initState() {
     super.initState();
-
-    myFocusNode = FocusNode();
+    myFocusNode.addListener(_checkAndChangeIcon);
+    _controller.addListener(_checkAndChangeIcon);
+    animatedIcon = _micIcon();
   }
 
   @override
@@ -143,16 +144,13 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final SharedPreferencesService sharedPreferences =
-        GetIt.I.get<SharedPreferencesService>();
-    final DatabaseService database = GetIt.I.get<DatabaseService>();
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Row(
         children: [
           Expanded(
             child: TextField(
+              // onTap: _changeIconToSend,
               controller: _controller,
               focusNode: myFocusNode,
               style: const TextStyle(fontSize: 16.0),
@@ -164,21 +162,54 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
             ),
           ),
           AnimatedSwitcher(
-            duration: Duration(microseconds: 50),
-            child: IconButton(
-              onPressed: () {
-                myFocusNode.unfocus();
-                _controller.text.isNotEmpty || _controller.text != ""
-                    ? database.sendMessage(
-                        sharedPreferences.uuid, _controller.text)
-                    : null;
-                _controller.text = "";
+              duration: const Duration(seconds: 1),
+              switchInCurve: Curves.ease,
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                return ScaleTransition(scale: animation, child: child);
               },
-              icon: const Icon(Icons.send),
-            ),
-          )
+              child: animatedIcon)
         ],
       ),
     );
+  }
+
+  Widget _micIcon() {
+    return IconButton(
+      key: UniqueKey(),
+      onPressed: () {
+        myFocusNode.unfocus();
+      },
+      icon: const Icon(Icons.mic),
+    );
+  }
+
+  Widget _sendIcon() {
+    final SharedPreferencesService sharedPreferences =
+        GetIt.I.get<SharedPreferencesService>();
+    final DatabaseService database = GetIt.I.get<DatabaseService>();
+
+    return IconButton(
+      key: UniqueKey(),
+      onPressed: () {
+        myFocusNode.unfocus();
+        _controller.text.isNotEmpty || _controller.text != ""
+            ? database.sendMessage(sharedPreferences.uuid, _controller.text)
+            : null;
+        _controller.text = "";
+      },
+      icon: const Icon(Icons.send),
+    );
+  }
+
+  void _checkAndChangeIcon() {
+    Widget targetIcon = _controller.text != "" && myFocusNode.hasFocus
+        ? _sendIcon()
+        : _micIcon();
+
+    if (targetIcon != animatedIcon) {
+      setState(() {
+        animatedIcon = targetIcon;
+      });
+    }
   }
 }

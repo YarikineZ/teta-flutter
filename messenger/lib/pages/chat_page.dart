@@ -1,25 +1,26 @@
-﻿import 'package:messenger/services/shared_preferences_service.dart';
+﻿import 'package:get_it/get_it.dart';
+import 'package:messenger/services/shared_preferences_service.dart';
 
 import '../models/message.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:string_to_hex/string_to_hex.dart';
 import 'package:flutter/material.dart';
 import 'package:messenger/services/database_servise.dart';
-import 'package:provider/provider.dart';
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+class ChatPage extends StatefulWidget {
+  final String pageTitle;
+  const ChatPage({super.key, required this.pageTitle});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<ChatPage> createState() => _ChatPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     var scaffold = Scaffold(
       appBar: AppBar(
-        title: const Text("Chat"),
+        title: Text(widget.pageTitle),
       ),
       body: const MessagesList(),
       bottomSheet: const MyBottomSheet(),
@@ -35,7 +36,7 @@ class MessagesList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DatabaseService database = context.read<DatabaseService>();
+    final DatabaseService database = GetIt.I.get<DatabaseService>();
 
     return StreamBuilder(
         stream: database.messagesStream(),
@@ -132,9 +133,9 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final DatabaseService database = context.read<DatabaseService>();
     final SharedPreferencesService sharedPreferences =
-        context.read<SharedPreferencesService>();
+        GetIt.I.get<SharedPreferencesService>();
+    final DatabaseService database = GetIt.I.get<DatabaseService>();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),

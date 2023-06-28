@@ -47,25 +47,32 @@ class DatabaseService with ChangeNotifier {
     await usersRef.child(userId).set(user.toJson());
   }
 
-  Future<List<User>> getUsers() async {
-    List<User> users = [];
-    var snapshot = await usersRef.get();
+  Stream<List<User>> usersStream() => usersRef.onValue.map((e) {
+        List<User> usersList = [];
 
-    final firebaseUsers =
-        Map<dynamic, dynamic>.from(snapshot.value as Map<dynamic, dynamic>);
+        final firebaseUsers = Map<dynamic, dynamic>.from(
+            e.snapshot.value as Map<dynamic, dynamic>);
 
-    firebaseUsers.forEach((key, value) {
-      final currentUser = Map<String, dynamic>.from(value);
-      users.add(User.fromJson(currentUser));
-    });
+        firebaseUsers.forEach((key, value) {
+          final currentUser = Map<String, dynamic>.from(value);
+          usersList.add(User.fromJson(currentUser));
+        });
 
-    return users;
-  }
+        return usersList;
+      });
+
+  // Future<List<User>> getUsers() async {
+  //   List<User> users = [];
+  //   var snapshot = await usersRef.get();
+
+  //   final firebaseUsers =
+  //       Map<dynamic, dynamic>.from(snapshot.value as Map<dynamic, dynamic>);
+
+  //   firebaseUsers.forEach((key, value) {
+  //     final currentUser = Map<String, dynamic>.from(value);
+  //     users.add(User.fromJson(currentUser));
+  //   });
+
+  //   return users;
+  // }
 }
-// Создать модель User c полями
-// id
-// displayName
-// photoUrl
-// При изменении имени сохранять значение в Firebase /users/id/displayName
-// При изменении фото сохранять значение URL в /users/id/photoUrl
-// Загружать и выводить список всех /users на странице контактов

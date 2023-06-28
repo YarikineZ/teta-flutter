@@ -14,13 +14,5 @@ class User with _$User {
     String? photoURL,
   }) = _User;
 
-  // void set name(String newName) {
-  //   name = newName;
-  // }
-
-  // void set uuid(String newuUUID) {
-  //   uuid = newuUUID;
-  // }
-
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 }

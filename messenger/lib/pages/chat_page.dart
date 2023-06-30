@@ -160,7 +160,7 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
             ),
           ),
           AnimatedSwitcher(
-              duration: const Duration(seconds: 1),
+              duration: const Duration(milliseconds: 200),
               switchInCurve: Curves.ease,
               transitionBuilder: (Widget child, Animation<double> animation) {
                 return ScaleTransition(scale: animation, child: child);
@@ -195,6 +195,7 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
             : null;
         _controller.text = "";
       },
+      highlightColor: Colors.green,
       icon: const Icon(Icons.send),
     );
   }

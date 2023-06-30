@@ -125,14 +125,13 @@ class MyBottomSheet extends StatefulWidget {
 class _MyBottomSheetState extends State<MyBottomSheet> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode myFocusNode = FocusNode();
-  late Widget animatedIcon;
+  bool _isMic = true;
 
   @override
   void initState() {
     super.initState();
     myFocusNode.addListener(_checkAndChangeIcon);
     _controller.addListener(_checkAndChangeIcon);
-    animatedIcon = _micIcon();
   }
 
   @override
@@ -150,7 +149,6 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
         children: [
           Expanded(
             child: TextField(
-              // onTap: _changeIconToSend,
               controller: _controller,
               focusNode: myFocusNode,
               style: const TextStyle(fontSize: 16.0),
@@ -167,7 +165,7 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
               transitionBuilder: (Widget child, Animation<double> animation) {
                 return ScaleTransition(scale: animation, child: child);
               },
-              child: animatedIcon)
+              child: _isMic ? _micIcon() : _sendIcon())
         ],
       ),
     );
@@ -175,7 +173,7 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
 
   Widget _micIcon() {
     return IconButton(
-      key: UniqueKey(),
+      key: const ValueKey('micIcon'),
       onPressed: () {
         myFocusNode.unfocus();
       },
@@ -189,7 +187,7 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
     final DatabaseService database = GetIt.I.get<DatabaseService>();
 
     return IconButton(
-      key: UniqueKey(),
+      key: const ValueKey('sendIcon'),
       onPressed: () {
         myFocusNode.unfocus();
         _controller.text.isNotEmpty || _controller.text != ""
@@ -202,13 +200,12 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
   }
 
   void _checkAndChangeIcon() {
-    Widget targetIcon = _controller.text != "" && myFocusNode.hasFocus
-        ? _sendIcon()
-        : _micIcon();
+    bool tagetIsMic =
+        _controller.text != "" && myFocusNode.hasFocus ? false : true;
 
-    if (targetIcon != animatedIcon) {
+    if (tagetIsMic != _isMic) {
       setState(() {
-        animatedIcon = targetIcon;
+        _isMic = tagetIsMic;
       });
     }
   }

@@ -69,8 +69,7 @@ class _MessagesListState extends State<MessagesList> {
                 },
                 child: _isShimmer
                     ? const MessagesShimmer()
-                    // : showMessages(snapshot)
-                    : const MessagesShimmer(),
+                    : showMessages(snapshot),
               ));
 
           // child: _isShimmer ? showShimmer() : showMessages(snapshot));

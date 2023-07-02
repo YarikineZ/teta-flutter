@@ -29,11 +29,17 @@ class _ChatPageState extends State<ChatPage> {
   }
 }
 
-class MessagesList extends StatelessWidget {
+class MessagesList extends StatefulWidget {
   const MessagesList({
     super.key,
   });
 
+  @override
+  State<MessagesList> createState() => _MessagesListState();
+}
+
+class _MessagesListState extends State<MessagesList> {
+  late bool _isShimmer;
   @override
   Widget build(BuildContext context) {
     final DatabaseService database = GetIt.I.get<DatabaseService>();
@@ -41,25 +47,69 @@ class MessagesList extends StatelessWidget {
     return StreamBuilder(
         stream: database.messagesStream(),
         builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data != null) {
-            final List<Message>? messageList = snapshot.data;
-
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ListView.builder(
-                reverse: false,
-                itemCount: messageList?.length,
-                itemBuilder: (context, index) {
-                  return MessageWidget(message: messageList![index]);
-                },
-              ),
-            );
-          } else {
-            return const Center(
-              child: Text("No messages"),
-            );
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+            case ConnectionState.waiting:
+              _isShimmer = true;
+              break;
+            // break;
+            case ConnectionState.done:
+            case ConnectionState.active:
+              _isShimmer = false;
+            // break;
           }
+
+          return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  switchInCurve: Curves.ease,
+                  transitionBuilder:
+                      (Widget child, Animation<double> animation) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+                  child: _isShimmer
+                      ? showMessagesShimmer()
+                      : showMessages(snapshot)
+                  // : showMessagesShimmer()
+                  ));
+
+          // child: _isShimmer ? showShimmer() : showMessages(snapshot));
         });
+  }
+
+  Widget showMessages(snapshot) {
+    if (snapshot.hasData && snapshot.data != null) {
+      final List<Message>? messageList = snapshot.data;
+      return ListView.builder(
+          key: const ValueKey('showMessages'),
+          reverse: false,
+          itemCount: messageList?.length,
+          itemBuilder: (context, index) {
+            return MessageWidget(message: messageList![index]);
+          });
+    } else {
+      return const Center(child: Text("No messages"));
+    }
+  }
+
+  Widget showMessagesShimmer() {
+    return ListView.builder(
+      key: const ValueKey('showMessagesShimmer'),
+      reverse: false,
+      itemCount: 5,
+      itemBuilder: (context, index) {
+        return Padding(
+            padding: const EdgeInsets.only(top: 16),
+            child: Container(
+                height: 50,
+                width: 360,
+                decoration: BoxDecoration(
+                  color: Colors.green[100],
+                  borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+                )));
+      },
+    );
   }
 }
 
@@ -100,9 +150,7 @@ class MessageWidget extends StatelessWidget {
                   fontSize: 13.0),
             )
           ]),
-          const SizedBox(
-            height: 8,
-          ),
+          const SizedBox(height: 8),
           Text(
             message.text,
             style: const TextStyle(fontSize: 16.0),

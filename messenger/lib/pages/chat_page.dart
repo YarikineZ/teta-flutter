@@ -62,17 +62,16 @@ class _MessagesListState extends State<MessagesList> {
           return Padding(
               padding: const EdgeInsets.all(16.0),
               child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 200),
-                  switchInCurve: Curves.ease,
-                  transitionBuilder:
-                      (Widget child, Animation<double> animation) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
-                  child: _isShimmer
-                      ? showMessagesShimmer()
-                      : showMessages(snapshot)
-                  // : showMessagesShimmer()
-                  ));
+                duration: const Duration(milliseconds: 200),
+                switchInCurve: Curves.ease,
+                transitionBuilder: (Widget child, Animation<double> animation) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
+                child: _isShimmer
+                    ? const MessagesShimmer()
+                    // : showMessages(snapshot)
+                    : const MessagesShimmer(),
+              ));
 
           // child: _isShimmer ? showShimmer() : showMessages(snapshot));
         });
@@ -92,8 +91,50 @@ class _MessagesListState extends State<MessagesList> {
       return const Center(child: Text("No messages"));
     }
   }
+}
 
-  Widget showMessagesShimmer() {
+class MessagesShimmer extends StatefulWidget {
+  const MessagesShimmer({super.key});
+
+  @override
+  State<MessagesShimmer> createState() => _MessagesShimmerState();
+}
+
+class _MessagesShimmerState extends State<MessagesShimmer>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation anOne;
+  late Animation anTwo;
+
+  @override
+  initState() {
+    // TODO: implement initState
+    super.initState();
+    _controller = AnimationController(
+        duration: const Duration(milliseconds: 1000), vsync: this);
+
+    Color twColor1 = Colors.white;
+    Color twColor2 = Colors.grey.shade300;
+
+    anOne = ColorTween(begin: twColor1, end: twColor2).animate(_controller);
+    anTwo = ColorTween(begin: twColor2, end: twColor1).animate(_controller);
+    _controller.forward();
+
+    _controller.addListener(() {
+      if (_controller.isCompleted) _controller.reverse();
+      if (_controller.isDismissed) _controller.forward();
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return ListView.builder(
       key: const ValueKey('showMessagesShimmer'),
       reverse: false,
@@ -101,13 +142,20 @@ class _MessagesListState extends State<MessagesList> {
       itemBuilder: (context, index) {
         return Padding(
             padding: const EdgeInsets.only(top: 16),
-            child: Container(
-                height: 50,
-                width: 360,
-                decoration: BoxDecoration(
-                  color: Colors.green[100],
-                  borderRadius: const BorderRadius.all(Radius.circular(10.0)),
-                )));
+            child: ShaderMask(
+              blendMode: BlendMode.modulate,
+              shaderCallback: (rect) {
+                return LinearGradient(colors: [anOne.value, anTwo.value])
+                    .createShader(rect);
+              },
+              child: Container(
+                  height: 50,
+                  width: 360,
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(255, 199, 255, 201),
+                    borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+                  )),
+            ));
       },
     );
   }

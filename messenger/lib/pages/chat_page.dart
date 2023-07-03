@@ -52,11 +52,10 @@ class _MessagesListState extends State<MessagesList> {
             case ConnectionState.waiting:
               _isShimmer = true;
               break;
-            // break;
             case ConnectionState.done:
             case ConnectionState.active:
               _isShimmer = false;
-            // break;
+              break;
           }
 
           return Padding(
@@ -71,8 +70,6 @@ class _MessagesListState extends State<MessagesList> {
                     ? const MessagesShimmer()
                     : showMessages(snapshot),
               ));
-
-          // child: _isShimmer ? showShimmer() : showMessages(snapshot));
         });
   }
 
@@ -102,28 +99,13 @@ class MessagesShimmer extends StatefulWidget {
 class _MessagesShimmerState extends State<MessagesShimmer>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation anOne;
-  late Animation anTwo;
 
   @override
   initState() {
-    // TODO: implement initState
     super.initState();
     _controller = AnimationController(
-        duration: const Duration(milliseconds: 1000), vsync: this);
-
-    Color twColor1 = Colors.white;
-    Color twColor2 = Colors.grey.shade300;
-
-    anOne = ColorTween(begin: twColor1, end: twColor2).animate(_controller);
-    anTwo = ColorTween(begin: twColor2, end: twColor1).animate(_controller);
-    _controller.forward();
-
-    _controller.addListener(() {
-      if (_controller.isCompleted) _controller.reverse();
-      if (_controller.isDismissed) _controller.forward();
-      setState(() {});
-    });
+        duration: const Duration(milliseconds: 1000), vsync: this)
+      ..repeat(reverse: true);
   }
 
   @override
@@ -134,29 +116,42 @@ class _MessagesShimmerState extends State<MessagesShimmer>
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      key: const ValueKey('showMessagesShimmer'),
-      reverse: false,
-      itemCount: 5,
-      itemBuilder: (context, index) {
-        return Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: ShaderMask(
-              blendMode: BlendMode.modulate,
-              shaderCallback: (rect) {
-                return LinearGradient(colors: [anOne.value, anTwo.value])
-                    .createShader(rect);
-              },
-              child: Container(
-                  height: 50,
-                  width: 360,
-                  decoration: BoxDecoration(
-                    color: Color.fromARGB(255, 199, 255, 201),
-                    borderRadius: const BorderRadius.all(Radius.circular(10.0)),
-                  )),
-            ));
-      },
-    );
+    return AnimatedBuilder(
+        animation: _controller,
+        child: ListView.builder(
+          key: const ValueKey('showMessagesShimmer'),
+          reverse: false,
+          itemCount: 5,
+          itemBuilder: (context, index) {
+            return Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: Container(
+                    height: 50,
+                    width: 360,
+                    decoration: const BoxDecoration(
+                      color: Color.fromARGB(255, 199, 255, 201),
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    )));
+          },
+        ),
+        builder: (BuildContext context, Widget? child) {
+          Color twColor1 = Colors.white;
+          Color twColor2 = Colors.grey.shade300;
+
+          Animation anOne =
+              ColorTween(begin: twColor1, end: twColor2).animate(_controller);
+          Animation anTwo =
+              ColorTween(begin: twColor2, end: twColor1).animate(_controller);
+
+          return ShaderMask(
+            blendMode: BlendMode.modulate,
+            shaderCallback: (rect) {
+              return LinearGradient(colors: [anOne.value, anTwo.value])
+                  .createShader(rect);
+            },
+            child: child,
+          );
+        });
   }
 }
 

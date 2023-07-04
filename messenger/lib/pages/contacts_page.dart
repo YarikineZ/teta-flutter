@@ -58,12 +58,33 @@ class UserCardWidget extends StatelessWidget {
           leading: CircleAvatar(child: Text(user.displayName![0])),
           title: Text(user.displayName!),
           onTap: () {
-            Navigator.of(context).push(CupertinoPageRoute(
-                builder: ((context) =>
-                    ChatPage(pageTitle: user.displayName!))));
+            //Material анимация
+            // Navigator.of(context).push(CupertinoPageRoute(
+            //     builder: ((context) =>
+            //         ChatPage(pageTitle: user.displayName!))));
+            Navigator.of(context)
+                .push(_createRoute(ChatPage(pageTitle: user.displayName!)));
           },
         ),
       ],
     );
   }
+}
+
+Route _createRoute(Widget to) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => to,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(1.0, 0.0);
+      const end = Offset.zero;
+      const curve = Curves.ease;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
 }

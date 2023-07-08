@@ -80,7 +80,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   child: const Text("Edit"))
         ],
       ),
-      body: Container(
+      body: SizedBox(
         width: MediaQuery.of(context).size.width,
         child: Column(
           children: [
@@ -97,7 +97,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 64.0),
                     child: TextField(
                       controller: _controller,
-                      decoration: InputDecoration(labelText: 'Enter Your name'),
+                      decoration:
+                          const InputDecoration(labelText: 'Enter Your name'),
                     ))
                 : Text(sharedPreferences.name),
             TextButton(

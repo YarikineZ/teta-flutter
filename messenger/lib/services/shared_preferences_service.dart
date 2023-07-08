@@ -29,7 +29,6 @@ class SharedPreferencesService with ChangeNotifier {
     if (name != null) {
       return name;
     } else {
-      print("USER NAME IS NULL");
       return "No user name";
     }
   }

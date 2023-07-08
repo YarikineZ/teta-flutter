@@ -16,21 +16,21 @@ class _ChatsPageState extends State<ChatsPage> {
       body: ListView(children: [
         ListTile(
           leading: CircleAvatar(child: Text('B')),
-          title: Text('Name Name'),
+          title: Text('Chat with user 1'),
           subtitle: Text("hello!"),
           trailing: Text("5 hours ago"),
         ),
         Divider(height: 0),
         ListTile(
           leading: CircleAvatar(child: Text('B')),
-          title: Text('Name Name'),
+          title: Text('Chat with user 2'),
           subtitle: Text("hello!"),
           trailing: Text("5 hours ago"),
         ),
         Divider(height: 0),
         ListTile(
           leading: CircleAvatar(child: Text('B')),
-          title: Text('Name Name'),
+          title: Text('Chat with user 3'),
           subtitle: Text("hello!"),
           trailing: Text("5 hours ago"),
         ),

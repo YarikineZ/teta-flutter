@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart' hide PhoneAuthProvider;
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 
 import 'package:messenger/services/database_servise.dart';
 import 'package:messenger/services/shared_preferences_service.dart';
@@ -16,6 +18,8 @@ Future<void> main() async {
   final firebaseApp = await Firebase.initializeApp(
       name: 'aaa', options: DefaultFirebaseOptions.currentPlatform);
 
+  FirebaseUIAuth.configureProviders([PhoneAuthProvider()]);
+
   final sharedPreferences = SharedPreferencesService();
   await sharedPreferences.init();
   final database = DatabaseService();
@@ -29,11 +33,12 @@ Future<void> main() async {
   getIt.registerSingleton<DatabaseService>(database);
   getIt.registerSingleton<StorageService>(storage);
 
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+  final providers = [PhoneAuthProvider()];
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +49,32 @@ class MyApp extends StatelessWidget {
         fontFamily: 'TimesNewRoman',
         useMaterial3: true,
       ),
-      home: const HomePage(),
+      initialRoute:
+          FirebaseAuth.instance.currentUser == null ? '/phone' : '/home',
+      routes: {
+        '/sign-in': (context) {
+          return SignInScreen(
+            providers: providers,
+            actions: [
+              VerifyPhoneAction((context, state) {
+                Navigator.pushReplacementNamed(context, '/home');
+              }),
+            ],
+          );
+        },
+        '/home': (context) => const HomePage(),
+        '/phone': (context) => PhoneInputScreen(actions: [
+              SMSCodeRequestedAction((context, action, flowKey, phoneNumber) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => SMSCodeInputScreen(
+                      flowKey: flowKey,
+                    ),
+                  ),
+                );
+              }),
+            ])
+      },
     );
   }
 }

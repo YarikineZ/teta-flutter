@@ -27,6 +27,8 @@ Future<void> main() async {
   final storage = StorageService();
   await storage.init(firebaseApp);
 
+  await FirebaseUIAuth.signOut(); //TODO DELL
+
   final getIt = GetIt.instance;
 
   getIt.registerSingleton<SharedPreferencesService>(sharedPreferences);
@@ -50,7 +52,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       initialRoute:
-          FirebaseAuth.instance.currentUser == null ? '/phone' : '/home',
+          FirebaseAuth.instance.currentUser == null ? '/sign-in' : '/home',
       routes: {
         '/sign-in': (context) {
           return SignInScreen(
@@ -63,17 +65,19 @@ class MyApp extends StatelessWidget {
           );
         },
         '/home': (context) => const HomePage(),
-        '/phone': (context) => PhoneInputScreen(actions: [
-              SMSCodeRequestedAction((context, action, flowKey, phoneNumber) {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => SMSCodeInputScreen(
-                      flowKey: flowKey,
+        '/phone': (context) => PhoneInputScreen(
+              actions: [
+                SMSCodeRequestedAction((context, action, flowKey, phoneNumber) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => SMSCodeInputScreen(
+                        flowKey: flowKey,
+                      ),
                     ),
-                  ),
-                );
-              }),
-            ])
+                  );
+                }),
+              ],
+            )
       },
     );
   }

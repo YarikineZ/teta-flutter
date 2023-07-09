@@ -2,7 +2,7 @@
 import 'package:image_picker/image_picker.dart';
 import 'package:messenger/services/shared_preferences_service.dart';
 import 'package:get_it/get_it.dart';
-import 'package:messenger/widgets/web_view_widget.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 
 import '../services/database_servise.dart';
 import '../services/storage_servise.dart';
@@ -54,6 +54,11 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  void signOut() async {
+    await FirebaseUIAuth.signOut();
+    Navigator.pushNamed(context, '/sign-in');
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -101,13 +106,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     ))
                 : Text(sharedPreferences.name),
             TextButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const WebViewContainer()));
-              },
-              child: const Text("WebView"),
+              onPressed: signOut,
+              child: const Text("Sign Out"),
             ),
           ],
         ),

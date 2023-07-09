@@ -7,19 +7,19 @@ import 'chats_list_page.dart';
 import 'contacts_page.dart';
 
 class HomePage extends StatefulWidget {
-  final SharedPreferencesService sharedPreferences =
-      GetIt.I.get<SharedPreferencesService>();
-  HomePage({super.key});
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  final SharedPreferencesService sharedPreferences =
+      GetIt.I.get<SharedPreferencesService>();
   @override
   void initState() {
-    widget.sharedPreferences.loadUser();
     super.initState();
+    sharedPreferences.loadUser();
   }
 
   int _selectedIndex = 0;

@@ -7,7 +7,7 @@ import 'chats_list_page.dart';
 import 'contacts_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();

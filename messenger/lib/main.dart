@@ -18,16 +18,19 @@ Future<void> main() async {
   final firebaseApp = await Firebase.initializeApp(
       name: 'aaa', options: DefaultFirebaseOptions.currentPlatform);
 
-  FirebaseUIAuth.configureProviders([PhoneAuthProvider()]);
+  FirebaseUIAuth.configureProviders(
+    [PhoneAuthProvider()],
+    app: firebaseApp,
+  );
 
-  final sharedPreferences = SharedPreferencesService();
+  final sharedPreferences = SharedPreferencesService(firebaseApp);
   await sharedPreferences.init();
   final database = DatabaseService();
   await database.init(firebaseApp);
   final storage = StorageService();
   await storage.init(firebaseApp);
 
-  // await FirebaseUIAuth.signOut(); //TODO DELL
+  await FirebaseUIAuth.signOut(); //TODO DELL
 
   final getIt = GetIt.instance;
 
@@ -41,8 +44,9 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
+  MyApp({required this.firebaseApp, super.key});
+
   final FirebaseApp firebaseApp;
-  const MyApp({required this.firebaseApp, super.key});
 
   @override
   Widget build(BuildContext context) {

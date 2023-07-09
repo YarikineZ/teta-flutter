@@ -1,17 +1,27 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:messenger/pages/settings_page.dart';
 
+import '../services/shared_preferences_service.dart';
 import 'chats_list_page.dart';
 import 'contacts_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final SharedPreferencesService sharedPreferences =
+      GetIt.I.get<SharedPreferencesService>();
+  HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    widget.sharedPreferences.loadUser();
+    super.initState();
+  }
+
   int _selectedIndex = 0;
   static const List<Widget> _widgetOptions = <Widget>[
     ContactsPage(),

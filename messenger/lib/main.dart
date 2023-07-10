@@ -20,17 +20,16 @@ Future<void> main() async {
 
   FirebaseUIAuth.configureProviders(
     [PhoneAuthProvider()],
-    app: firebaseApp,
   );
 
-  final sharedPreferences = SharedPreferencesService(firebaseApp);
+  final sharedPreferences = SharedPreferencesService();
   await sharedPreferences.init();
   final database = DatabaseService();
   await database.init(firebaseApp);
   final storage = StorageService();
   await storage.init(firebaseApp);
 
-  await FirebaseUIAuth.signOut(); //TODO DELL
+  // await FirebaseUIAuth.signOut(); //TODO DELL
 
   final getIt = GetIt.instance;
 
@@ -38,15 +37,11 @@ Future<void> main() async {
   getIt.registerSingleton<DatabaseService>(database);
   getIt.registerSingleton<StorageService>(storage);
 
-  runApp(MyApp(
-    firebaseApp: firebaseApp,
-  ));
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({required this.firebaseApp, super.key});
-
-  final FirebaseApp firebaseApp;
+  MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -58,9 +53,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       initialRoute:
-          FirebaseAuth.instanceFor(app: firebaseApp).currentUser == null
-              ? '/sign-in'
-              : '/home',
+          FirebaseAuth.instance.currentUser == null ? '/sign-in' : '/home',
       routes: {
         '/sign-in': (context) {
           return SignInScreen(

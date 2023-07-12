@@ -7,7 +7,7 @@ import 'chats_list_page.dart';
 import 'contacts_page.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({super.key});
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -16,6 +16,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final SharedPreferencesService sharedPreferences =
       GetIt.I.get<SharedPreferencesService>();
+
   @override
   void initState() {
     super.initState();

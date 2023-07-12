@@ -56,7 +56,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   void signOut() async {
     await FirebaseUIAuth.signOut();
-    Navigator.pushNamed(context, '/sign-in');
+    Navigator.pushNamed(context, '/phone');
   }
 
   @override

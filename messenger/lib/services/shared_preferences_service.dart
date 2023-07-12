@@ -1,11 +1,9 @@
 ﻿import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:firebase_auth/firebase_auth.dart' hide User;
 
 class SharedPreferencesService with ChangeNotifier {
   SharedPreferencesService(this.firebaseApp);
-  //late User user;
   late String uuid;
   late String name;
   late String avatarURL;
@@ -15,7 +13,6 @@ class SharedPreferencesService with ChangeNotifier {
 
   Future init() async {
     prefs = await SharedPreferences.getInstance();
-    _clearSharedProferencesData(); //{}- ничего...
   }
 
   Future loadUser() async {
@@ -44,11 +41,13 @@ class SharedPreferencesService with ChangeNotifier {
     if (oldUuid != null) {
       return oldUuid;
     } else {
-      String newUuid =
-          FirebaseAuth.instanceFor(app: firebaseApp).currentUser!.uid;
-      await prefs.setString("uuid", newUuid);
-      return newUuid;
+      return "NULL";
     }
+  }
+
+  Future<void> setUUID(newUuid) async {
+    uuid = newUuid;
+    await prefs.setString("uuid", newUuid);
   }
 
   Future<String> _getAvatarURL() async {
@@ -67,8 +66,8 @@ class SharedPreferencesService with ChangeNotifier {
     await prefs.setString("avatarURL", newURL);
   }
 
-  void _clearSharedProferencesData() {
+  void _showSharedProferencesData() {
     var keys = prefs.getKeys();
-    print(keys);
+    print("Shared Preferences data: ${keys}");
   }
 }

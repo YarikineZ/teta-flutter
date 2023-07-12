@@ -30,7 +30,17 @@ Future<void> main() async {
   final storage = StorageService();
   await storage.init(firebaseApp);
 
-  await FirebaseUIAuth.signOut(); //TODO DELL
+  // await FirebaseUIAuth.signOut(); //TODO DELL
+
+  FirebaseAuth.instance.authStateChanges().listen((User? user) {
+    if (user == null) {
+      print('User is currently signed out!');
+    } else {
+      print('User is signed in!');
+      sharedPreferences.setUUID(user.uid);
+      //Потом надо будет написать полноценную синхронизацию юзера из гугла и моего
+    }
+  });
 
   final getIt = GetIt.instance;
 
@@ -38,15 +48,14 @@ Future<void> main() async {
   getIt.registerSingleton<DatabaseService>(database);
   getIt.registerSingleton<StorageService>(storage);
 
-  runApp(MyApp(
-    firebaseApp: firebaseApp,
-  ));
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({required this.firebaseApp, super.key});
+  MyApp({super.key});
 
-  final FirebaseApp firebaseApp;
+  final SharedPreferencesService sharedPreferences =
+      GetIt.I.get<SharedPreferencesService>();
 
   @override
   Widget build(BuildContext context) {
@@ -58,21 +67,9 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       initialRoute:
-          FirebaseAuth.instanceFor(app: firebaseApp).currentUser == null
-              ? '/sign-in'
-              : '/home',
+          FirebaseAuth.instance.currentUser == null ? '/phone' : '/home',
       routes: {
-        '/sign-in': (context) {
-          return SignInScreen(
-            providers: [PhoneAuthProvider()],
-            actions: [
-              VerifyPhoneAction((context, state) {
-                Navigator.pushReplacementNamed(context, '/phone');
-              }),
-            ],
-          );
-        },
-        '/home': (context) => HomePage(),
+        '/home': (context) => const HomePage(),
         '/phone': (context) => PhoneInputScreen(
               actions: [
                 SMSCodeRequestedAction((context, action, flowKey, phoneNumber) {
@@ -80,6 +77,12 @@ class MyApp extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (context) => SMSCodeInputScreen(
                         flowKey: flowKey,
+                        actions: [
+                          AuthStateChangeAction<SignedIn>((context, state) {
+                            Navigator.pushNamedAndRemoveUntil(
+                                context, '/home', (route) => false);
+                          })
+                        ],
                       ),
                     ),
                   );

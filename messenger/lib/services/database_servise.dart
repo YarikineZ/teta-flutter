@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:messenger/models/message.dart';
 import 'package:messenger/models/user.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 //flutterfire configure
 
@@ -45,6 +46,17 @@ class DatabaseService with ChangeNotifier {
   Future updateUser(userId, name, photoURL) async {
     final user = User(id: userId, displayName: name, photoURL: photoURL);
     await usersRef.child(userId).set(user.toJson());
+  }
+
+  Future addOrUpdateUser(auth.User fbUser) async {
+    final user = User(
+        id: fbUser.uid,
+        displayName:
+            fbUser.displayName != null && fbUser.displayName!.isNotEmpty
+                ? fbUser.displayName
+                : 'NoName',
+        photoURL: fbUser.photoURL);
+    await usersRef.child(fbUser.uid).set(user.toJson());
   }
 
   Stream<List<User>> usersStream() => usersRef.onValue.map((e) {

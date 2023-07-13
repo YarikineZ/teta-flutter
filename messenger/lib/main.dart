@@ -32,12 +32,13 @@ Future<void> main() async {
 
   // await FirebaseUIAuth.signOut(); //TODO DELL
 
-  FirebaseAuth.instance.authStateChanges().listen((User? user) {
-    if (user == null) {
+  FirebaseAuth.instance.authStateChanges().listen((User? fbUser) {
+    if (fbUser == null) {
       print('User is currently signed out!');
     } else {
       print('User is signed in!');
-      sharedPreferences.setUUID(user.uid);
+      sharedPreferences.setUUID(fbUser.uid);
+      database.addOrUpdateUser(fbUser);
       //Потом надо будет написать полноценную синхронизацию юзера из гугла и моего
     }
   });

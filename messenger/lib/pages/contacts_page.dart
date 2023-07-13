@@ -55,7 +55,9 @@ class UserCardWidget extends StatelessWidget {
       children: [
         const Divider(height: 0),
         ListTile(
-          leading: CircleAvatar(child: Text(user.displayName![0])),
+          leading: user.displayName != null && user.displayName!.isNotEmpty
+              ? CircleAvatar(child: Text(user.displayName![0]))
+              : const CircleAvatar(child: Text("NO")),
           title: Text(user.displayName!),
           onTap: () {
             //Material анимация

@@ -1,8 +1,8 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
+// import 'package:get_it/get_it.dart';
 import 'package:messenger/pages/settings_page.dart';
 
-import '../services/shared_preferences_service.dart';
+// import '../services/shared_preferences_service.dart';
 import 'chats_list_page.dart';
 import 'contacts_page.dart';
 
@@ -14,13 +14,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final SharedPreferencesService sharedPreferences =
-      GetIt.I.get<SharedPreferencesService>();
-
   @override
   void initState() {
     super.initState();
-    sharedPreferences.loadUser();
   }
 
   int _selectedIndex = 0;

@@ -10,8 +10,8 @@ part 'user.g.dart';
 class User with _$User {
   const factory User({
     required String id,
-    String? displayName,
-    String? photoURL,
+    required String displayName,
+    required String photoURL,
   }) = _User;
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);

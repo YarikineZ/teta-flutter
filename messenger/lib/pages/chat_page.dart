@@ -1,5 +1,5 @@
 ﻿import 'package:get_it/get_it.dart';
-import 'package:messenger/services/shared_preferences_service.dart';
+import 'package:messenger/services/user_service.dart';
 
 import '../models/message.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -272,8 +272,7 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
   }
 
   Widget _sendIcon() {
-    final SharedPreferencesService sharedPreferences =
-        GetIt.I.get<SharedPreferencesService>();
+    UserService userService = GetIt.I.get<UserService>();
     final DatabaseService database = GetIt.I.get<DatabaseService>();
 
     return IconButton(
@@ -281,7 +280,7 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
       onPressed: () {
         myFocusNode.unfocus();
         _controller.text.isNotEmpty || _controller.text != ""
-            ? database.sendMessage(sharedPreferences.uuid, _controller.text)
+            ? database.sendMessage(userService.user.id, _controller.text)
             : null;
         _controller.text = "";
       },

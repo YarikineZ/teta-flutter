@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart' hide PhoneAuthProvider;
+import 'package:firebase_auth/firebase_auth.dart' as fb hide PhoneAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 
 import 'package:messenger/services/database_servise.dart';
-import 'package:messenger/services/shared_preferences_service.dart';
 import 'package:messenger/services/storage_servise.dart';
+import 'package:messenger/services/user_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'firebase_options.dart';
 import 'package:get_it/get_it.dart';
@@ -23,31 +24,35 @@ Future<void> main() async {
     app: firebaseApp,
   );
 
-  final sharedPreferences = SharedPreferencesService(firebaseApp);
-  await sharedPreferences.init();
+  // final sharedPreferences = SharedPreferencesService(firebaseApp);
+  // await sharedPreferences.init();
+
   final database = DatabaseService();
   await database.init(firebaseApp);
   final storage = StorageService();
   await storage.init(firebaseApp);
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-  // await FirebaseUIAuth.signOut(); //TODO DELL
+  await FirebaseUIAuth.signOut(); //TODO DELL
 
-  FirebaseAuth.instance.authStateChanges().listen((User? fbUser) {
+  final getIt = GetIt.instance;
+  getIt.registerSingleton<DatabaseService>(database);
+  getIt.registerSingleton<StorageService>(storage);
+  getIt.registerSingleton<SharedPreferences>(prefs);
+
+  UserService userService = UserService();
+
+  fb.FirebaseAuth.instance.authStateChanges().listen((fb.User? fbUser) {
     if (fbUser == null) {
       print('User is currently signed out!');
     } else {
       print('User is signed in!');
-      sharedPreferences.setUUID(fbUser.uid);
-      database.addOrUpdateUser(fbUser);
-      //Потом надо будет написать полноценную синхронизацию юзера из гугла и моего
+
+      userService.init(fbUser);
+      getIt.registerSingleton<UserService>(
+          userService); //возможно нужно поставить выше, там где остальные
     }
   });
-
-  final getIt = GetIt.instance;
-
-  getIt.registerSingleton<SharedPreferencesService>(sharedPreferences);
-  getIt.registerSingleton<DatabaseService>(database);
-  getIt.registerSingleton<StorageService>(storage);
 
   runApp(MyApp());
 }
@@ -55,8 +60,8 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   MyApp({super.key});
 
-  final SharedPreferencesService sharedPreferences =
-      GetIt.I.get<SharedPreferencesService>();
+  // final SharedPreferencesService sharedPreferences =
+  //     GetIt.I.get<SharedPreferencesService>();
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +73,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       initialRoute:
-          FirebaseAuth.instance.currentUser == null ? '/phone' : '/home',
+          fb.FirebaseAuth.instance.currentUser == null ? '/phone' : '/home',
       routes: {
         '/home': (context) => const HomePage(),
         '/phone': (context) => PhoneInputScreen(

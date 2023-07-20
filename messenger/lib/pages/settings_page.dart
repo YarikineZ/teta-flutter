@@ -1,10 +1,9 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:messenger/services/shared_preferences_service.dart';
 import 'package:get_it/get_it.dart';
-import 'package:messenger/widgets/web_view_widget.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:messenger/services/user_service.dart';
 
-import '../services/database_servise.dart';
 import '../services/storage_servise.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -17,41 +16,41 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   bool _isEdit = false;
   final TextEditingController _controller = TextEditingController();
+  UserService userService = GetIt.I.get<UserService>();
 
   @override
   void initState() {
     super.initState();
   }
 
-  void _edit(SharedPreferencesService sharedPreferences) {
+  void _edit(UserService userService) {
     setState(() {
       _isEdit = true;
-      _controller.text = sharedPreferences.name;
+      _controller.text = userService.user.displayName;
     });
   }
 
-  void _done(
-      SharedPreferencesService sharedPreferences, DatabaseService database) {
+  void _done(UserService userService) {
     setState(() {
       _isEdit = false;
-      sharedPreferences.saveNewName(_controller.text);
-      database.updateUser(sharedPreferences.uuid, _controller.text,
-          sharedPreferences.avatarURL);
+      userService.setName(_controller.text);
     });
   }
 
-  void pickImage(
-      StorageService storage,
-      SharedPreferencesService sharedPreferences,
-      DatabaseService database) async {
+  void pickImage(StorageService storage, UserService userService) async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
       String downloadURL = await storage.pushImage(image.name, image.path);
-      sharedPreferences.setAvatarURL(downloadURL);
-      database.updateUser(
-          sharedPreferences.uuid, sharedPreferences.name, downloadURL);
+      userService.setAvatar(downloadURL);
     }
+  }
+
+  void signOut() async {
+    //TODO проверить нужен ли тут асинк
+    await FirebaseUIAuth.signOut();
+    Navigator.pushNamed(context, '/phone');
+    GetIt.I.unregister<UserService>();
   }
 
   @override
@@ -62,10 +61,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final SharedPreferencesService sharedPreferences =
-        GetIt.I.get<SharedPreferencesService>();
     final StorageService storage = GetIt.I.get<StorageService>();
-    final DatabaseService database = GetIt.I.get<DatabaseService>();
 
     return Scaffold(
       appBar: AppBar(
@@ -73,10 +69,10 @@ class _SettingsPageState extends State<SettingsPage> {
         actions: [
           _isEdit
               ? TextButton(
-                  onPressed: () => _done(sharedPreferences, database),
+                  onPressed: () => _done(userService),
                   child: const Text("Done"))
               : TextButton(
-                  onPressed: () => _edit(sharedPreferences),
+                  onPressed: () => _edit(userService),
                   child: const Text("Edit"))
         ],
       ),
@@ -85,11 +81,11 @@ class _SettingsPageState extends State<SettingsPage> {
         child: Column(
           children: [
             GestureDetector(
-              onTap: () => pickImage(storage, sharedPreferences, database),
+              onTap: () => pickImage(storage, userService),
               child: CircleAvatar(
                   radius: 32,
-                  child: Image.network(sharedPreferences
-                      .avatarURL)), //TODO make background image
+                  child: Image.network(
+                      userService.user.photoURL)), //TODO make background image
             ),
             const SizedBox(height: 32.0),
             _isEdit
@@ -100,15 +96,10 @@ class _SettingsPageState extends State<SettingsPage> {
                       decoration:
                           const InputDecoration(labelText: 'Enter Your name'),
                     ))
-                : Text(sharedPreferences.name),
+                : Text(userService.user.displayName),
             TextButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const WebViewContainer()));
-              },
-              child: const Text("WebView"),
+              onPressed: signOut,
+              child: const Text("Sign Out"),
             ),
           ],
         ),

@@ -101,6 +101,10 @@ class _SettingsPageState extends State<SettingsPage> {
               onPressed: signOut,
               child: const Text("Sign Out"),
             ),
+            TextButton(
+              onPressed: () => Navigator.pushNamed(context, '/map'),
+              child: const Text("Go to Map"),
+            ),
           ],
         ),
       ),

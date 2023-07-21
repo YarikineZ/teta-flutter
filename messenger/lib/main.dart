@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'package:get_it/get_it.dart';
 import 'pages/home_page.dart';
+import 'package:messenger/pages/map_page.dart';
 
 GetIt getIt = GetIt.instance;
 
@@ -23,9 +24,6 @@ Future<void> main() async {
     [PhoneAuthProvider()],
     app: firebaseApp,
   );
-
-  // final sharedPreferences = SharedPreferencesService(firebaseApp);
-  // await sharedPreferences.init();
 
   final database = DatabaseService();
   await database.init(firebaseApp);
@@ -54,14 +52,11 @@ Future<void> main() async {
     }
   });
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({super.key});
-
-  // final SharedPreferencesService sharedPreferences =
-  //     GetIt.I.get<SharedPreferencesService>();
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +70,7 @@ class MyApp extends StatelessWidget {
       initialRoute:
           fb.FirebaseAuth.instance.currentUser == null ? '/phone' : '/home',
       routes: {
+        '/map': (context) => const MapPage(),
         '/home': (context) => const HomePage(),
         '/phone': (context) => PhoneInputScreen(
               actions: [

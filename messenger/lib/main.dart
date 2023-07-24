@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb hide PhoneAuthProvider;
@@ -19,6 +20,12 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final firebaseApp = await Firebase.initializeApp(
       name: 'aaa', options: DefaultFirebaseOptions.currentPlatform);
+
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  NotificationSettings settings =
+      await messaging.requestPermission(alert: true, badge: true, sound: true);
+  final fcmToken = await FirebaseMessaging.instance.getToken();
+  print(fcmToken);
 
   FirebaseUIAuth.configureProviders(
     [PhoneAuthProvider()],

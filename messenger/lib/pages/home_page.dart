@@ -1,8 +1,5 @@
 ﻿import 'package:flutter/material.dart';
-// import 'package:get_it/get_it.dart';
 import 'package:messenger/pages/settings_page.dart';
-
-// import '../services/shared_preferences_service.dart';
 import 'chats_list_page.dart';
 import 'contacts_page.dart';
 
@@ -14,12 +11,18 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
+
   @override
   void initState() {
     super.initState();
   }
 
-  int _selectedIndex = 0;
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   static const List<Widget> _widgetOptions = <Widget>[
     ContactsPage(),
     ChatsPage(),
@@ -34,6 +37,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    int? args = ModalRoute.of(context)!.settings.arguments as int?;
+    if (args != null) _selectedIndex = args;
+
     return Scaffold(
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),

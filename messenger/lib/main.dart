@@ -14,7 +14,16 @@ import 'package:get_it/get_it.dart';
 import 'pages/home_page.dart';
 import 'package:messenger/pages/map_page.dart';
 
-GetIt getIt = GetIt.instance;
+Future<void> _onMessageOpenedApp(RemoteMessage message) async {
+  print('===========');
+  print('App opened from message ${message.messageId}');
+  // runApp(const MyApp());
+}
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print('===========');
+  print('Handling a background message ${message.messageId}');
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +36,9 @@ Future<void> main() async {
   final fcmToken = await FirebaseMessaging.instance.getToken();
   print(fcmToken);
 
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  FirebaseMessaging.onMessageOpenedApp.listen(_onMessageOpenedApp);
+
   FirebaseUIAuth.configureProviders(
     [PhoneAuthProvider()],
     app: firebaseApp,
@@ -38,7 +50,7 @@ Future<void> main() async {
   await storage.init(firebaseApp);
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-  await FirebaseUIAuth.signOut(); //TODO DELL
+  // await FirebaseUIAuth.signOut(); //TODO DELL
 
   final getIt = GetIt.instance;
   getIt.registerSingleton<DatabaseService>(database);
@@ -62,8 +74,24 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      if (fb.FirebaseAuth.instance.currentUser != null) {
+        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false,
+            arguments: 1);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +117,8 @@ class MyApp extends StatelessWidget {
                         actions: [
                           AuthStateChangeAction<SignedIn>((context, state) {
                             Navigator.pushNamedAndRemoveUntil(
-                                context, '/home', (route) => false);
+                                context, '/home', (route) => false,
+                                arguments: 2);
                           })
                         ],
                       ),

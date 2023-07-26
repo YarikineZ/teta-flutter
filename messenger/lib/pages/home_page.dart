@@ -1,4 +1,8 @@
 ﻿import 'package:flutter/material.dart';
+
+import 'package:firebase_auth/firebase_auth.dart' as fb hide PhoneAuthProvider;
+import 'package:firebase_messaging/firebase_messaging.dart';
+
 import 'package:messenger/pages/settings_page.dart';
 import 'chats_list_page.dart';
 import 'contacts_page.dart';
@@ -12,10 +16,16 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
-
   @override
   void initState() {
     super.initState();
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      if (fb.FirebaseAuth.instance.currentUser != null) {
+        setState(() {
+          _selectedIndex = 1;
+        });
+      }
+    });
   }
 
   @override
@@ -37,9 +47,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    int? args = ModalRoute.of(context)!.settings.arguments as int?;
-    if (args != null) _selectedIndex = args;
-
     return Scaffold(
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),

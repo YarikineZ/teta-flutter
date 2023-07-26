@@ -50,7 +50,6 @@ class _SettingsPageState extends State<SettingsPage> {
     //TODO проверить нужен ли тут асинк
     await FirebaseUIAuth.signOut();
     Navigator.pushNamed(context, '/phone');
-    GetIt.I.unregister<UserService>();
   }
 
   @override

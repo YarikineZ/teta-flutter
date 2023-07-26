@@ -57,17 +57,16 @@ Future<void> main() async {
   getIt.registerSingleton<StorageService>(storage);
   getIt.registerSingleton<SharedPreferences>(prefs);
 
-  UserService userService = UserService();
-
   fb.FirebaseAuth.instance.authStateChanges().listen((fb.User? fbUser) {
     if (fbUser == null) {
       print('User is currently signed out!');
+      GetIt.I.unregister<UserService>();
+      //надо как-то сделать полную очистку приложения - рестарт
     } else {
       print('User is signed in!');
-
+      UserService userService = UserService();
       userService.init(fbUser);
-      getIt.registerSingleton<UserService>(
-          userService); //возможно нужно поставить выше, там где остальные
+      getIt.registerSingleton<UserService>(userService);
     }
   });
 
@@ -82,17 +81,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  @override
-  void initState() {
-    super.initState();
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      if (fb.FirebaseAuth.instance.currentUser != null) {
-        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false,
-            arguments: 1);
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -117,8 +105,7 @@ class _MyAppState extends State<MyApp> {
                         actions: [
                           AuthStateChangeAction<SignedIn>((context, state) {
                             Navigator.pushNamedAndRemoveUntil(
-                                context, '/home', (route) => false,
-                                arguments: 2);
+                                context, '/home', (route) => false);
                           })
                         ],
                       ),

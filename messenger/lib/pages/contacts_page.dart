@@ -2,7 +2,7 @@
 import 'package:get_it/get_it.dart';
 
 import '../models/user.dart';
-import '../services/database_servise.dart';
+import '../services/realtime_db_servise.dart';
 import 'chat_page.dart';
 
 class ContactsPage extends StatefulWidget {
@@ -15,7 +15,7 @@ class ContactsPage extends StatefulWidget {
 class _ContactsPageState extends State<ContactsPage> {
   @override
   Widget build(BuildContext context) {
-    final DatabaseService database = GetIt.I.get<DatabaseService>();
+    final RealtimeDbService database = GetIt.I.get<RealtimeDbService>();
 
     return Scaffold(
         appBar: AppBar(title: const Text("Contacts")),

@@ -1,12 +1,11 @@
 ﻿import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:messenger/models/message.dart';
 import 'package:messenger/models/user.dart';
 
 //flutterfire configure
 
-class DatabaseService with ChangeNotifier {
+class RealtimeDbService {
   late DatabaseReference messagesRef;
   late DatabaseReference usersRef;
 

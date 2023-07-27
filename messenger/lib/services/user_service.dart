@@ -2,11 +2,10 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:messenger/models/user.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
-
-import 'database_servise.dart';
+import 'realtime_db_servise.dart';
 
 class UserService {
-  final DatabaseService database = GetIt.I.get<DatabaseService>();
+  final RealtimeDbService database = GetIt.I.get<RealtimeDbService>();
   final SharedPreferences prefs = GetIt.I.get<SharedPreferences>();
   late fb.User fbUser;
 

@@ -5,7 +5,7 @@ import '../models/message.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:string_to_hex/string_to_hex.dart';
 import 'package:flutter/material.dart';
-import 'package:messenger/services/database_servise.dart';
+import 'package:messenger/services/realtime_db_servise.dart';
 
 class ChatPage extends StatefulWidget {
   final String pageTitle;
@@ -42,7 +42,7 @@ class _MessagesListState extends State<MessagesList> {
   late bool _isShimmer;
   @override
   Widget build(BuildContext context) {
-    final DatabaseService database = GetIt.I.get<DatabaseService>();
+    final RealtimeDbService database = GetIt.I.get<RealtimeDbService>();
 
     return StreamBuilder(
         stream: database.messagesStream(),
@@ -273,7 +273,7 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
 
   Widget _sendIcon() {
     UserService userService = GetIt.I.get<UserService>();
-    final DatabaseService database = GetIt.I.get<DatabaseService>();
+    final RealtimeDbService database = GetIt.I.get<RealtimeDbService>();
 
     return IconButton(
       key: const ValueKey('sendIcon'),

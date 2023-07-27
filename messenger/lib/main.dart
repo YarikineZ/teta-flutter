@@ -4,7 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb hide PhoneAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 
-import 'package:messenger/services/database_servise.dart';
+import 'package:messenger/services/realtime_db_servise.dart';
 import 'package:messenger/services/storage_servise.dart';
 import 'package:messenger/services/user_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -44,8 +44,8 @@ Future<void> main() async {
     app: firebaseApp,
   );
 
-  final database = DatabaseService();
-  await database.init(firebaseApp);
+  final firebaseDB = RealtimeDbService();
+  await firebaseDB.init(firebaseApp);
   final storage = StorageService();
   await storage.init(firebaseApp);
   final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -53,7 +53,7 @@ Future<void> main() async {
   // await FirebaseUIAuth.signOut(); //TODO DELL
 
   final getIt = GetIt.instance;
-  getIt.registerSingleton<DatabaseService>(database);
+  getIt.registerSingleton<RealtimeDbService>(firebaseDB);
   getIt.registerSingleton<StorageService>(storage);
   getIt.registerSingleton<SharedPreferences>(prefs);
 

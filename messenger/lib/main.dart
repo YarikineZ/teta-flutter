@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb hide PhoneAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:messenger/data/repository/user_repository.dart';
 
-import 'package:messenger/services/realtime_db_servise.dart';
 import 'package:messenger/services/storage_servise.dart';
 import 'package:messenger/services/user_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,7 +17,6 @@ import 'package:messenger/pages/map_page.dart';
 Future<void> _onMessageOpenedApp(RemoteMessage message) async {
   print('===========');
   print('App opened from message ${message.messageId}');
-  // runApp(const MyApp());
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -44,8 +43,9 @@ Future<void> main() async {
     app: firebaseApp,
   );
 
-  final firebaseDB = RealtimeDbService();
-  await firebaseDB.init(firebaseApp);
+  final repository = UserRepository(firebaseApp: firebaseApp);
+  await repository.init();
+
   final storage = StorageService();
   await storage.init(firebaseApp);
   final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -53,15 +53,14 @@ Future<void> main() async {
   // await FirebaseUIAuth.signOut(); //TODO DELL
 
   final getIt = GetIt.instance;
-  getIt.registerSingleton<RealtimeDbService>(firebaseDB);
+  getIt.registerSingleton<UserRepository>(repository);
   getIt.registerSingleton<StorageService>(storage);
   getIt.registerSingleton<SharedPreferences>(prefs);
 
   fb.FirebaseAuth.instance.authStateChanges().listen((fb.User? fbUser) {
     if (fbUser == null) {
       print('User is currently signed out!');
-      GetIt.I.unregister<UserService>();
-      //надо как-то сделать полную очистку приложения - рестарт
+      //TODO надо как-то сделать полную очистку приложения
     } else {
       print('User is signed in!');
       UserService userService = UserService();

@@ -1,8 +1,8 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:messenger/data/repository/user_repository.dart';
 
 import '../models/user.dart';
-import '../services/realtime_db_servise.dart';
 import 'chat_page.dart';
 
 class ContactsPage extends StatefulWidget {
@@ -15,12 +15,12 @@ class ContactsPage extends StatefulWidget {
 class _ContactsPageState extends State<ContactsPage> {
   @override
   Widget build(BuildContext context) {
-    final RealtimeDbService database = GetIt.I.get<RealtimeDbService>();
+    final UserRepository userRepository = GetIt.I.get<UserRepository>();
 
     return Scaffold(
         appBar: AppBar(title: const Text("Contacts")),
         body: StreamBuilder(
-            stream: database.usersStream(),
+            stream: userRepository.usersStream(),
             builder: (context, snapshot) {
               if (snapshot.hasData && snapshot.data != null) {
                 final List<User>? usersList = snapshot.data;

@@ -9,7 +9,7 @@ class RealtimeDbService {
   late DatabaseReference messagesRef;
   late DatabaseReference usersRef;
 
-  Future init(FirebaseApp firebaseApp) async {
+  init(FirebaseApp firebaseApp) {
     FirebaseDatabase database = FirebaseDatabase.instanceFor(app: firebaseApp);
     messagesRef = database.ref('messages');
     usersRef = database.ref('users');

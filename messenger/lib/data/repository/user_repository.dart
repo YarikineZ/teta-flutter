@@ -41,9 +41,8 @@ class UserRepository {
 
     // пока берет из сети и сохраняет в базу
     var stream = firebaseDbService.usersStream();
+    final usersStream = mapper.toUsersStreamfromNetworkUsers(stream);
 
-    final usersStream = stream.map(
-        (event) => event.map((e) => mapper.toUserFromNetworkUser(e)).toList());
     return usersStream;
   }
 

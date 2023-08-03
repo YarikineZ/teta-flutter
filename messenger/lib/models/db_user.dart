@@ -9,6 +9,4 @@ class DbUser {
   String? userId;
   String? displayName;
   String? photoURL;
-
-  // DbUser({userId, displayName, photoURL});
 }

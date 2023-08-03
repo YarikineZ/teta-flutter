@@ -31,16 +31,12 @@ class UserRepository {
   }
 
   Future<void> syncIsar(Stream<List<NetworkUser>> usersStream) async {
-    // сравним стримы
+    // сравним стримы из isar & FB
     // если не совпадают, то затрем базу и сохраним
-    // кстати сохранения не работают
-    Stream<List<DbUser>> dbUsersStream =
-        mapper.toDbUsersStreamfromNetworkUsersStream(
-            usersStream); //эта строчка не работает
 
     await usersStream.forEach((element) {
       for (NetworkUser el in element) {
-        final dbUser = mapper.toDbUserFromNetworkUser(el);
+        final DbUser dbUser = mapper.toDbUserFromNetworkUser(el);
         isarService.saveUser(dbUser);
       }
     });

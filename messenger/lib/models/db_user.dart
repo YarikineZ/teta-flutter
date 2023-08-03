@@ -10,5 +10,5 @@ class DbUser {
   String? displayName;
   String? photoURL;
 
-  DbUser({userId, displayName, photoURL}); //удалить если крашннет
+  // DbUser({userId, displayName, photoURL});
 }

@@ -12,8 +12,12 @@ class Mapper {
           Stream<List<NetworkUser>> st) =>
       st.map((event) => event.map((e) => toUserFromNetworkUser(e)).toList());
 
-  DbUser toDbUserFromNetworkUser(NetworkUser networkUser) => DbUser(
-      userId: networkUser.id,
-      displayName: networkUser.displayName,
-      photoURL: networkUser.photoURL);
+  DbUser toDbUserFromNetworkUser(NetworkUser networkUser) => DbUser()
+    ..userId = networkUser.id
+    ..displayName = networkUser.displayName
+    ..photoURL = networkUser.photoURL;
+
+  Stream<List<DbUser>> toDbUsersStreamfromNetworkUsersStream(
+          Stream<List<NetworkUser>> st) =>
+      st.map((event) => event.map((e) => toDbUserFromNetworkUser(e)).toList());
 }

@@ -1,9 +1,10 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb hide PhoneAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:messenger/data/repository/user_repository.dart';
 
-import 'package:messenger/services/database_servise.dart';
 import 'package:messenger/services/storage_servise.dart';
 import 'package:messenger/services/user_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,51 +14,73 @@ import 'package:get_it/get_it.dart';
 import 'pages/home_page.dart';
 import 'package:messenger/pages/map_page.dart';
 
-GetIt getIt = GetIt.instance;
+Future<void> _onMessageOpenedApp(RemoteMessage message) async {
+  print('===========');
+  print('App opened from message ${message.messageId}');
+}
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print('===========');
+  print('Handling a background message ${message.messageId}');
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final firebaseApp = await Firebase.initializeApp(
       name: 'aaa', options: DefaultFirebaseOptions.currentPlatform);
 
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  NotificationSettings settings =
+      await messaging.requestPermission(alert: true, badge: true, sound: true);
+  final fcmToken = await FirebaseMessaging.instance.getToken();
+  print(fcmToken);
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  FirebaseMessaging.onMessageOpenedApp.listen(_onMessageOpenedApp);
+
   FirebaseUIAuth.configureProviders(
     [PhoneAuthProvider()],
     app: firebaseApp,
   );
 
-  final database = DatabaseService();
-  await database.init(firebaseApp);
+  final repository = UserRepository(firebaseApp: firebaseApp);
+  await repository.init();
+
   final storage = StorageService();
   await storage.init(firebaseApp);
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-  await FirebaseUIAuth.signOut(); //TODO DELL
+  // await FirebaseUIAuth.signOut(); //TODO DELL
 
   final getIt = GetIt.instance;
-  getIt.registerSingleton<DatabaseService>(database);
+  getIt.registerSingleton<UserRepository>(repository);
   getIt.registerSingleton<StorageService>(storage);
   getIt.registerSingleton<SharedPreferences>(prefs);
-
-  UserService userService = UserService();
 
   fb.FirebaseAuth.instance.authStateChanges().listen((fb.User? fbUser) {
     if (fbUser == null) {
       print('User is currently signed out!');
+      GetIt.I.unregister<UserService>();
+      //TODO надо как-то сделать полную очистку приложения
     } else {
       print('User is signed in!');
-
+      UserService userService = UserService();
       userService.init(fbUser);
-      getIt.registerSingleton<UserService>(
-          userService); //возможно нужно поставить выше, там где остальные
+      getIt.registerSingleton<UserService>(userService);
     }
   });
 
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

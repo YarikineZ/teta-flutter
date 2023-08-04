@@ -1,8 +1,9 @@
 ﻿import 'package:flutter/material.dart';
-// import 'package:get_it/get_it.dart';
-import 'package:messenger/pages/settings_page.dart';
 
-// import '../services/shared_preferences_service.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb hide PhoneAuthProvider;
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+import 'package:messenger/pages/settings_page.dart';
 import 'chats_list_page.dart';
 import 'contacts_page.dart';
 
@@ -14,12 +15,24 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
   @override
   void initState() {
     super.initState();
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      if (fb.FirebaseAuth.instance.currentUser != null) {
+        setState(() {
+          _selectedIndex = 1;
+        });
+      }
+    });
   }
 
-  int _selectedIndex = 0;
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   static const List<Widget> _widgetOptions = <Widget>[
     ContactsPage(),
     ChatsPage(),

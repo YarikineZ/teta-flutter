@@ -1,16 +1,15 @@
 ﻿import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:messenger/models/message.dart';
-import 'package:messenger/models/user.dart';
+import 'package:messenger/models/network_user.dart';
 
 //flutterfire configure
 
-class DatabaseService with ChangeNotifier {
+class RealtimeDbService {
   late DatabaseReference messagesRef;
   late DatabaseReference usersRef;
 
-  Future init(FirebaseApp firebaseApp) async {
+  init(FirebaseApp firebaseApp) {
     FirebaseDatabase database = FirebaseDatabase.instanceFor(app: firebaseApp);
     messagesRef = database.ref('messages');
     usersRef = database.ref('users');
@@ -42,19 +41,19 @@ class DatabaseService with ChangeNotifier {
       });
 
   Future addOrUpdateUser(userId, name, photoURL) async {
-    final user = User(id: userId, displayName: name, photoURL: photoURL);
+    final user = NetworkUser(id: userId, displayName: name, photoURL: photoURL);
     await usersRef.child(userId).set(user.toJson());
   }
 
-  Stream<List<User>> usersStream() => usersRef.onValue.map((e) {
-        List<User> usersList = [];
+  Stream<List<NetworkUser>> usersStream() => usersRef.onValue.map((e) {
+        List<NetworkUser> usersList = [];
 
         final firebaseUsers = Map<dynamic, dynamic>.from(
             e.snapshot.value as Map<dynamic, dynamic>);
 
         firebaseUsers.forEach((key, value) {
           final currentUser = Map<String, dynamic>.from(value);
-          usersList.add(User.fromJson(currentUser));
+          usersList.add(NetworkUser.fromJson(currentUser));
         });
 
         return usersList;

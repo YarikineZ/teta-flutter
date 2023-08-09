@@ -57,18 +57,8 @@ Future<void> main() async {
   getIt.registerSingleton<StorageService>(storage);
   getIt.registerSingleton<SharedPreferences>(prefs);
 
-  fb.FirebaseAuth.instance.authStateChanges().listen((fb.User? fbUser) {
-    if (fbUser == null) {
-      print('User is currently signed out!');
-      GetIt.I.unregister<UserService>();
-      //TODO надо как-то сделать полную очистку приложения
-    } else {
-      print('User is signed in!');
-      UserService userService = UserService();
-      userService.init(fbUser);
-      getIt.registerSingleton<UserService>(userService);
-    }
-  });
+  UserService userService = UserService();
+  getIt.registerSingleton<UserService>(userService);
 
   runApp(const MyApp());
 }

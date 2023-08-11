@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb hide PhoneAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
-import 'package:messenger/controllers/settings_screen.dart';
+import 'package:messenger/controllers/settings_screen_controller.dart';
 import 'package:messenger/data/repository/user_repository.dart';
+import 'package:messenger/models/settings_page.dart';
 
 import 'package:messenger/services/storage_servise.dart';
 import 'package:messenger/services/user_service.dart';
@@ -27,8 +28,9 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print('Handling a background message ${message.messageId}');
 }
 
-// final userServiceProvider = Provider<UserService>((_) => UserService());
-final settingsScreeenProvider = Provider((_) => SettingsScreenController());
+final settingsScreeenProvider =
+    StateNotifierProvider<SettingsScreenController, SettingsPageModel>(
+        (ref) => SettingsScreenController());
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

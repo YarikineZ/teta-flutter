@@ -15,7 +15,6 @@ class UserService {
       "https://cdn-icons-png.flaticon.com/512/2202/2202112.png";
 
   UserService() {
-    //перенести в init?
     fb.FirebaseAuth.instance.authStateChanges().listen((fb.User? fbUser) {
       if (fbUser == null) {
         print('User is currently signed out!');

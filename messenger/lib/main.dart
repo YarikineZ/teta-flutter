@@ -29,8 +29,11 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 final settingsScreeenProvider =
-    StateNotifierProvider<SettingsScreenController, SettingsPageModel>(
-        (ref) => SettingsScreenController());
+    StateNotifierProvider<SettingsScreenController, SettingsPageModel>((ref) {
+  final controller = SettingsScreenController();
+  ref.onDispose(() => controller.dispose());
+  return controller;
+});
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

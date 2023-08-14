@@ -22,7 +22,6 @@ class SettingsPageR extends ConsumerWidget {
               ? TextButton(
                   onPressed: () =>
                       ref.read(settingsScreeenProvider.notifier).done(),
-                  // onPressed: () => ref.read(settingsScreeenProvider.notifier).update((state) => "null"),
                   child: const Text("Done"))
               : TextButton(
                   onPressed: () =>

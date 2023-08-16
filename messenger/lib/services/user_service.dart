@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:messenger/models/user.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'realtime_db_servise.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb hide PhoneAuthProvider;
 
 class UserService {
   final RealtimeDbService database = GetIt.I.get<RealtimeDbService>();
@@ -12,6 +13,18 @@ class UserService {
   late User user;
   final defaultAvatarURL =
       "https://cdn-icons-png.flaticon.com/512/2202/2202112.png";
+
+  UserService() {
+    fb.FirebaseAuth.instance.authStateChanges().listen((fb.User? fbUser) {
+      if (fbUser == null) {
+        print('User is currently signed out!');
+        //TODO надо как-то сделать полную очистку приложения
+      } else {
+        print('User is signed in!');
+        init(fbUser);
+      }
+    });
+  }
 
   void init(fb.User _user) async {
     fbUser = _user;

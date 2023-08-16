@@ -3,11 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb hide PhoneAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:messenger/controllers/settings_screen_controller.dart';
 import 'package:messenger/data/repository/user_repository.dart';
+import 'package:messenger/models/settings_page.dart';
 
 import 'package:messenger/services/storage_servise.dart';
 import 'package:messenger/services/user_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'firebase_options.dart';
 import 'package:get_it/get_it.dart';
@@ -23,6 +27,13 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print('===========');
   print('Handling a background message ${message.messageId}');
 }
+
+final settingsScreeenProvider =
+    StateNotifierProvider<SettingsScreenController, SettingsPageModel>((ref) {
+  final controller = SettingsScreenController();
+  ref.onDispose(() => controller.dispose());
+  return controller;
+});
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -57,20 +68,14 @@ Future<void> main() async {
   getIt.registerSingleton<StorageService>(storage);
   getIt.registerSingleton<SharedPreferences>(prefs);
 
-  fb.FirebaseAuth.instance.authStateChanges().listen((fb.User? fbUser) {
-    if (fbUser == null) {
-      print('User is currently signed out!');
-      GetIt.I.unregister<UserService>();
-      //TODO надо как-то сделать полную очистку приложения
-    } else {
-      print('User is signed in!');
-      UserService userService = UserService();
-      userService.init(fbUser);
-      getIt.registerSingleton<UserService>(userService);
-    }
-  });
+  UserService userService = UserService();
+  getIt.registerSingleton<UserService>(userService);
 
-  runApp(const MyApp());
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {

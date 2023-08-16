@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart' as fb hide PhoneAuthProvider;
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:messenger/pages/settings_page.dart';
+import 'package:messenger/pages/settings_page_riverpod.dart';
 import 'chats_list_page.dart';
 import 'contacts_page.dart';
 
@@ -36,7 +37,7 @@ class _HomePageState extends State<HomePage> {
   static const List<Widget> _widgetOptions = <Widget>[
     ContactsPage(),
     ChatsPage(),
-    SettingsPage(),
+    SettingsPageR()
   ];
 
   void _onItemTapped(int index) {

@@ -1,77 +1,31 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:get_it/get_it.dart';
-import 'package:firebase_ui_auth/firebase_ui_auth.dart';
-import 'package:messenger/services/user_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../services/storage_servise.dart';
+import '../main.dart';
 
-class SettingsPage extends StatefulWidget {
+class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
-  @override
-  State<SettingsPage> createState() => _SettingsPageState();
-}
-
-class _SettingsPageState extends State<SettingsPage> {
-  bool _isEdit = false;
-  final TextEditingController _controller = TextEditingController();
-  UserService userService = GetIt.I.get<UserService>();
+  final defaultAvatarURL =
+      "https://cdn-icons-png.flaticon.com/512/2202/2202112.png";
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  void _edit(UserService userService) {
-    setState(() {
-      _isEdit = true;
-      _controller.text = userService.user.displayName;
-    });
-  }
-
-  void _done(UserService userService) {
-    setState(() {
-      _isEdit = false;
-      userService.setName(_controller.text);
-    });
-  }
-
-  void pickImage(StorageService storage, UserService userService) async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      String downloadURL = await storage.pushImage(image.name, image.path);
-      userService.setAvatar(downloadURL);
-    }
-  }
-
-  void signOut() async {
-    //TODO проверить нужен ли тут асинк
-    await FirebaseUIAuth.signOut();
-    Navigator.pushNamed(context, '/phone');
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _controller.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final StorageService storage = GetIt.I.get<StorageService>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final pageController = ref.watch(settingsScreeenProvider);
+    // чтобы не писать as SettingsPageModel указал явный тип при инициализации провайдера ;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text("Settings"),
         actions: [
-          _isEdit
+          pageController.isEdit
               ? TextButton(
-                  onPressed: () => _done(userService),
+                  onPressed: () =>
+                      ref.read(settingsScreeenProvider.notifier).done(),
                   child: const Text("Done"))
               : TextButton(
-                  onPressed: () => _edit(userService),
+                  onPressed: () =>
+                      ref.read(settingsScreeenProvider.notifier).edit(),
                   child: const Text("Edit"))
         ],
       ),
@@ -80,29 +34,27 @@ class _SettingsPageState extends State<SettingsPage> {
         child: Column(
           children: [
             GestureDetector(
-              onTap: () => pickImage(storage, userService),
+              onTap: () =>
+                  ref.read(settingsScreeenProvider.notifier).pickImage(),
               child: CircleAvatar(
-                  radius: 32,
-                  child: Image.network(
-                      userService.user.photoURL)), //TODO make background image
+                  radius: 32, child: Image.network(pageController.avatarURL)),
             ),
             const SizedBox(height: 32.0),
-            _isEdit
+            pageController.isEdit
                 ? Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 64.0),
                     child: TextField(
-                      controller: _controller,
+                      controller: ref
+                          .read(settingsScreeenProvider.notifier)
+                          .textEditingController,
                       decoration:
                           const InputDecoration(labelText: 'Enter Your name'),
                     ))
-                : Text(userService.user.displayName),
+                : Text(pageController.userName),
             TextButton(
-              onPressed: signOut,
+              onPressed: () => Navigator.pushNamed(
+                  context, '/phone'), //TODO Add sign out from firebase
               child: const Text("Sign Out"),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pushNamed(context, '/map'),
-              child: const Text("Go to Map"),
             ),
           ],
         ),

@@ -16,7 +16,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'firebase_options.dart';
 import 'package:get_it/get_it.dart';
 import 'pages/home_page.dart';
-import 'package:messenger/pages/map_page.dart';
 
 Future<void> _onMessageOpenedApp(RemoteMessage message) async {
   print('===========');
@@ -98,7 +97,6 @@ class _MyAppState extends State<MyApp> {
       initialRoute:
           fb.FirebaseAuth.instance.currentUser == null ? '/phone' : '/home',
       routes: {
-        '/map': (context) => const MapPage(),
         '/home': (context) => const HomePage(),
         '/phone': (context) => PhoneInputScreen(
               actions: [

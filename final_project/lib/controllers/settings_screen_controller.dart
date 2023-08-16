@@ -1,4 +1,5 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:get_it/get_it.dart';
@@ -17,17 +18,18 @@ class SettingsScreenController extends StateNotifier<SettingsPageModel> {
   // SettingsScreenController(super.state); // требует начальных параметров при инициализацити
 
   SettingsScreenController()
-      : super(const SettingsPageModel(
-            userName: "No user name",
-            avatarURL:
-                "https://cdn-icons-png.flaticon.com/512/2202/2202112.png",
-            isEdit: false));
+      : super(
+          const SettingsPageModel(
+              userName: "No user name",
+              avatarURL:
+                  "https://cdn-icons-png.flaticon.com/512/2202/2202112.png",
+              isEdit: false,
+              isSnackBar: false), //TODO убрать?
+        );
 
   void edit() {
     state = state.copyWith(isEdit: true);
     textEditingController.text = userService.user.displayName;
-
-    // сюда доходит
   }
 
   void done() {
@@ -46,5 +48,13 @@ class SettingsScreenController extends StateNotifier<SettingsPageModel> {
       String downloadURL = await storage.pushImage(image.name, image.path);
       userService.setAvatar(downloadURL);
     }
+  }
+
+  void copyUUID() async {
+    await Clipboard.setData(ClipboardData(text: userService.user.id));
+    state = state.copyWith(isSnackBar: true);
+    Future.delayed(const Duration(seconds: 3), () {
+      state = state.copyWith(isSnackBar: false);
+    });
   }
 }

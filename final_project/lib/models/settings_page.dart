@@ -9,6 +9,7 @@ class SettingsPageModel with _$SettingsPageModel {
     required String userName,
     required String avatarURL,
     required bool isEdit,
+    required bool isSnackBar,
   }) = _SettingsPageModel;
 
   factory SettingsPageModel.fromJson(Map<String, dynamic> json) =>

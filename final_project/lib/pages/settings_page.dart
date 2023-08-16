@@ -56,8 +56,28 @@ class SettingsPage extends ConsumerWidget {
                   context, '/phone'), //TODO Add sign out from firebase
               child: const Text("Sign Out"),
             ),
+            TextButton(
+              onPressed: () =>
+                  ref.read(settingsScreeenProvider.notifier).copyUUID(),
+              child: const Text("Copy my UUID"),
+            ),
           ],
         ),
+      ),
+      bottomSheet: pageController.isSnackBar ? const SnackBar() : null,
+    );
+  }
+}
+
+class SnackBar extends ConsumerWidget {
+  const SnackBar({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return const SizedBox(
+      height: 50,
+      child: Center(
+        child: Text("UUID Copied"),
       ),
     );
   }

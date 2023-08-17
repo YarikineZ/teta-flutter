@@ -8,11 +8,13 @@ import 'package:messenger/models/network_user.dart';
 class RealtimeDbService {
   late DatabaseReference messagesRef;
   late DatabaseReference usersRef;
+  late DatabaseReference userContactsRef;
 
   init(FirebaseApp firebaseApp) {
     FirebaseDatabase database = FirebaseDatabase.instanceFor(app: firebaseApp);
     messagesRef = database.ref('messages');
     usersRef = database.ref('users');
+    userContactsRef = database.ref('userContacts');
   }
 
   Future sendMessage(userId, text) async {
@@ -45,7 +47,7 @@ class RealtimeDbService {
     await usersRef.child(userId).set(user.toJson());
   }
 
-  Stream<List<NetworkUser>> usersStream() => usersRef.onValue.map((e) {
+  Stream<List<NetworkUser>> allUsersStream() => usersRef.onValue.map((e) {
         List<NetworkUser> usersList = [];
 
         final firebaseUsers = Map<dynamic, dynamic>.from(
@@ -58,4 +60,11 @@ class RealtimeDbService {
 
         return usersList;
       });
+
+  // Stream<List<NetworkUser>> myContactsStream() => {}; //TODO
+
+  Future addContact(userId, contactId) async {
+    final contactRef = userContactsRef.child(userId).push();
+    await contactRef.set(contactId);
+  }
 }

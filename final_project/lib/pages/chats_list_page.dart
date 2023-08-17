@@ -12,8 +12,8 @@ class _ChatsPageState extends State<ChatsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Contacts")),
-      body: ListView(children: [
+      appBar: AppBar(title: Text("Chats")),
+      body: ListView(children: const [
         ListTile(
           leading: CircleAvatar(child: Text('B')),
           title: Text('Chat with user 1'),

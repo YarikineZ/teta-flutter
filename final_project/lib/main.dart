@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb hide PhoneAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:messenger/controllers/contacts_screen_controller.dart';
 import 'package:messenger/controllers/settings_screen_controller.dart';
 import 'package:messenger/data/repository/user_repository.dart';
 import 'package:messenger/models/settings_page.dart';
@@ -15,6 +16,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'firebase_options.dart';
 import 'package:get_it/get_it.dart';
+import 'models/contacts_page.dart';
 import 'pages/home_page.dart';
 
 Future<void> _onMessageOpenedApp(RemoteMessage message) async {
@@ -30,6 +32,13 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 final settingsScreeenProvider =
     StateNotifierProvider<SettingsScreenController, SettingsPageModel>((ref) {
   final controller = SettingsScreenController();
+  ref.onDispose(() => controller.dispose());
+  return controller;
+});
+
+final contactsScreeenProvider =
+    StateNotifierProvider<ContactsScreenController, ContactsPageModel>((ref) {
+  final controller = ContactsScreenController();
   ref.onDispose(() => controller.dispose());
   return controller;
 });

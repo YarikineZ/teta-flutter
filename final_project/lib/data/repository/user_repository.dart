@@ -24,8 +24,8 @@ class UserRepository {
   }
 
   Stream<List<User>> usersStream() {
-    var stream = firebaseDbService.usersStream().asBroadcastStream();
-    syncIsar(stream);
+    var stream = firebaseDbService.allUsersStream().asBroadcastStream();
+    // syncIsar(stream);
 
     return mapper.toUsersStreamfromNetworkUsersStream(stream);
   }

@@ -47,6 +47,7 @@ class SettingsScreenController extends StateNotifier<SettingsPageModel> {
     if (image != null) {
       String downloadURL = await storage.pushImage(image.name, image.path);
       userService.setAvatar(downloadURL);
+      state = state.copyWith(avatarURL: downloadURL);
     }
   }
 

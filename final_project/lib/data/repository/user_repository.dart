@@ -7,6 +7,7 @@ import 'package:messenger/services/realtime_db_servise.dart';
 import '../../models/db_user.dart';
 import '../../models/network_user.dart';
 import '../../models/user.dart';
+import '../../services/user_service.dart';
 import '../mapper.dart';
 
 class UserRepository {
@@ -24,7 +25,10 @@ class UserRepository {
   }
 
   Stream<List<User>> usersStream() {
-    var stream = firebaseDbService.allUsersStream().asBroadcastStream();
+    final UserService userService = GetIt.I.get<UserService>();
+    var stream = firebaseDbService
+        .myContactsStream(userService.user.id)
+        .asBroadcastStream();
     // syncIsar(stream);
 
     return mapper.toUsersStreamfromNetworkUsersStream(stream);

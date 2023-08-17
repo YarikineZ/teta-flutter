@@ -9,6 +9,7 @@ class RealtimeDbService {
   late DatabaseReference messagesRef;
   late DatabaseReference usersRef;
   late DatabaseReference userContactsRef;
+  late List myContactsIds;
 
   init(FirebaseApp firebaseApp) {
     FirebaseDatabase database = FirebaseDatabase.instanceFor(app: firebaseApp);
@@ -61,7 +62,31 @@ class RealtimeDbService {
         return usersList;
       });
 
-  // Stream<List<NetworkUser>> myContactsStream() => {}; //TODO
+  Stream<List<NetworkUser>> myContactsStream(String myUUID) {
+    userContactsRef.child(myUUID).onValue.listen((event) {
+      final myContacts = Map<dynamic, dynamic>.from(
+          event.snapshot.value as Map<dynamic, dynamic>);
+      myContactsIds = myContacts.values.toList();
+    });
+
+    return usersRef.onValue.map((e) {
+      List<NetworkUser> usersList = [];
+      NetworkUser currentNetUser;
+
+      final firebaseUsers =
+          Map<dynamic, dynamic>.from(e.snapshot.value as Map<dynamic, dynamic>);
+
+      firebaseUsers.forEach((key, value) {
+        final currentUserJson = Map<String, dynamic>.from(value);
+        currentNetUser = NetworkUser.fromJson(currentUserJson);
+
+        if (myContactsIds.contains(currentNetUser.id)) {
+          usersList.add(NetworkUser.fromJson(currentUserJson));
+        }
+      });
+      return usersList;
+    });
+  }
 
   Future addContact(userId, contactId) async {
     final contactRef = userContactsRef.child(userId).push();

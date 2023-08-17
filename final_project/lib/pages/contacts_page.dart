@@ -135,7 +135,7 @@ class BottomAddContact extends ConsumerWidget {
                           .text
                           .isEmpty
                       ? Colors.grey
-                      : null,
+                      : Color.fromARGB(255, 42, 98, 43),
                 )),
             TextButton(
               onPressed: ref

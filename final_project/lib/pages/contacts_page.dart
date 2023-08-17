@@ -1,8 +1,10 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 import 'package:messenger/data/repository/user_repository.dart';
 import 'package:messenger/main.dart';
+import 'package:messenger/pages/contact_page.dart';
 
 import '../models/user.dart';
 import 'chat_page.dart';
@@ -63,39 +65,16 @@ class UserCardWidget extends StatelessWidget {
       children: [
         const Divider(height: 0),
         ListTile(
-          leading: CircleAvatar(child: Text(user.displayName[0])),
+          leading: CircleAvatar(child: Image.network(user.photoURL)),
           title: Text(user.displayName),
           onTap: () {
-            //Material анимация
-            // Navigator.of(context).push(CupertinoPageRoute(
-            //     builder: ((context) =>
-            //         ChatPage(pageTitle: user.displayName!))));
-            Navigator.of(context)
-                .push(_createRoute(ChatPage(pageTitle: user.displayName)));
+            Navigator.of(context).push(CupertinoPageRoute(
+                builder: ((context) => ContactPage(contact: user))));
           },
         ),
       ],
     );
   }
-}
-
-//анимация перехода между страницами
-Route _createRoute(Widget to) {
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => to,
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      const begin = Offset(1.0, 0.0);
-      const end = Offset.zero;
-      const curve = Curves.ease;
-
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
-    },
-  );
 }
 
 class BottomAddContact extends ConsumerWidget {

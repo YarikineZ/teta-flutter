@@ -6,5 +6,6 @@ part 'contacts_page.freezed.dart';
 class ContactsPageModel with _$ContactsPageModel {
   const factory ContactsPageModel({
     required bool isAdding,
+    required bool isAddCintactButtonActive,
   }) = _ContactsPageModel;
 }

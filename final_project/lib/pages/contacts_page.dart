@@ -103,6 +103,8 @@ class BottomAddContact extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final pageController = ref.watch(contactsScreeenProvider);
+
     return SizedBox(
       height: 80,
       child: Padding(
@@ -116,17 +118,33 @@ class BottomAddContact extends ConsumerWidget {
                     .textEditingController,
                 decoration:
                     const InputDecoration(labelText: 'Paste contact UUID'),
+                onChanged: (_) => ref
+                    .read(contactsScreeenProvider.notifier)
+                    .controlAddContactbutton(),
               ),
             ),
             TextButton(
-                onPressed:
-                    ref.read(contactsScreeenProvider.notifier).addContact,
-                child: const Icon(Icons.add_rounded)),
+                onPressed: pageController.isAddCintactButtonActive
+                    ? ref.read(contactsScreeenProvider.notifier).addContact
+                    : null,
+                child: Icon(
+                  Icons.add_rounded,
+                  color: ref
+                          .watch(contactsScreeenProvider.notifier)
+                          .textEditingController
+                          .text
+                          .isEmpty
+                      ? Colors.grey
+                      : null,
+                )),
             TextButton(
-                onPressed: ref
-                    .read(contactsScreeenProvider.notifier)
-                    .hideAddContactWindow,
-                child: const Icon(Icons.arrow_drop_down))
+              onPressed: ref
+                  .read(contactsScreeenProvider.notifier)
+                  .hideAddContactWindow,
+              child: const Icon(
+                Icons.arrow_drop_down,
+              ),
+            )
           ],
         ),
       ),

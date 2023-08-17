@@ -18,14 +18,12 @@ class SettingsScreenController extends StateNotifier<SettingsPageModel> {
   // SettingsScreenController(super.state); // требует начальных параметров при инициализацити
 
   SettingsScreenController()
-      : super(
-          const SettingsPageModel(
-              userName: "No user name",
-              avatarURL:
-                  "https://cdn-icons-png.flaticon.com/512/2202/2202112.png",
-              isEdit: false,
-              isSnackBar: false), //TODO убрать?
-        );
+      : super(const SettingsPageModel(
+          userName: "No user name",
+          avatarURL: "https://cdn-icons-png.flaticon.com/512/2202/2202112.png",
+          isEdit: false,
+          isSnackBar: false,
+        ));
 
   void edit() {
     state = state.copyWith(isEdit: true);

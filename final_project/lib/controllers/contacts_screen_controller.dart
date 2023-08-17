@@ -10,7 +10,9 @@ class ContactsScreenController extends StateNotifier<ContactsPageModel> {
   final RealtimeDbService realtimeDbService = GetIt.I.get<RealtimeDbService>();
   final UserService userService = GetIt.I.get<UserService>();
 
-  ContactsScreenController() : super(const ContactsPageModel(isAdding: false));
+  ContactsScreenController()
+      : super(const ContactsPageModel(
+            isAdding: false, isAddCintactButtonActive: false));
 
   void showAddContactWindow() {
     state = state.copyWith(isAdding: true);
@@ -21,7 +23,15 @@ class ContactsScreenController extends StateNotifier<ContactsPageModel> {
   }
 
   void addContact() {
-    realtimeDbService.addContact(
-        userService.user.id, textEditingController.text);
+    if (textEditingController.text.isNotEmpty) {
+      realtimeDbService.addContact(
+          userService.user.id, textEditingController.text);
+    }
+  }
+
+  void controlAddContactbutton() {
+    textEditingController.text.isEmpty
+        ? state = state.copyWith(isAddCintactButtonActive: true)
+        : state = state.copyWith(isAddCintactButtonActive: false);
   }
 }

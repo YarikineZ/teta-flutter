@@ -41,7 +41,7 @@ class _MessagesListState extends State<MessagesList> {
     final RealtimeDbService database = GetIt.I.get<RealtimeDbService>();
 
     return StreamBuilder(
-        stream: database.allMessagesStream(widget.chat.id),
+        stream: database.messagesStream(widget.chat.id),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
@@ -279,8 +279,10 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
       onPressed: () {
         myFocusNode.unfocus();
         _controller.text.isNotEmpty || _controller.text != ""
-            ? database.sendMessage(
-                userService.user.id, widget.chat.id, _controller.text)
+            ? {
+                database.sendMessage(
+                    userService.user.id, widget.chat.id, _controller.text)
+              }
             : null;
         _controller.text = "";
       },

@@ -4,6 +4,8 @@ import 'package:messenger/models/chat.dart';
 import 'package:messenger/models/message.dart';
 import 'package:messenger/models/network_user.dart';
 
+import '../models/user.dart';
+
 //flutterfire configure
 
 class RealtimeDbService {
@@ -31,9 +33,12 @@ class RealtimeDbService {
     final message = Message(userId: userId, text: text, timestamp: nowTime);
     final messageRef = messagesRef.child(chatId).push();
     await messageRef.set(message.toJson());
+
+    updateChat(chatId, text, nowTime);
   }
 
-  Future updateChat(chatId, lastmessage, timestamp, {title = "TMP"}) async {
+  Future updateChat(chatId, lastmessage, timestamp,
+      {title = "Some user name"}) async {
     //Только для отображения на экране "Чаты"
     // добавить поиск имени по chatID
     final chat = Chat(
@@ -41,8 +46,8 @@ class RealtimeDbService {
         title: "TMP",
         lastmessage: lastmessage,
         timestamp: timestamp);
-    final chatRef = chatsRef.push();
-    await chatRef.set(chat.toJson());
+
+    await chatsRef.child(chatId).set(chat.toJson());
   }
 
   Future<String> startNewChat(myId, contactId) async {
@@ -64,7 +69,8 @@ class RealtimeDbService {
     return chatRef.key!;
   }
 
-  Stream<List<Message>> messagesStream() => messagesRef.onValue.map((e) {
+  //тестовый метод не для релиза
+  Stream<List<Message>> allMessagesStream() => messagesRef.onValue.map((e) {
         List<Message> messageList = [];
 
         final firebaseMessages = Map<dynamic, dynamic>.from(
@@ -79,8 +85,7 @@ class RealtimeDbService {
         return messageList;
       });
 
-  //тестовый метод не для релиза
-  Stream<List<Message>> allMessagesStream(String chatId) =>
+  Stream<List<Message>> messagesStream(String chatId) =>
       messagesRef.child(chatId).onValue.map((e) {
         List<Message> messageList = [];
 
@@ -131,6 +136,7 @@ class RealtimeDbService {
           Map<dynamic, dynamic>.from(e.snapshot.value as Map<dynamic, dynamic>);
 
       firebaseUsers.forEach((key, value) {
+        //TODO перевести на getUserByUUID
         final currentUserJson = Map<String, dynamic>.from(value);
         currentNetUser = NetworkUser.fromJson(currentUserJson);
 
@@ -171,7 +177,47 @@ class RealtimeDbService {
         }
       });
 
+      chatsList.sort((b, a) => a.timestamp.compareTo(b.timestamp));
+
       return chatsList;
     });
+  }
+
+  //Используется чтобы выводить аватар опонента рядом с карточкой чата
+  User getContactFromChat(String requiredChatId, String myUUID) {
+    userChatsRef.onValue.listen((e) {
+      final allFirebaseUserChats =
+          Map<dynamic, dynamic>.from(e.snapshot.value as Map<dynamic, dynamic>);
+      // print("Искомый чат $requiredChatId");
+
+      allFirebaseUserChats.forEach((userId, value) {
+        for (var chatId in Map<dynamic, dynamic>.from(value).values) {
+          if (chatId == requiredChatId && userId != myUUID) {
+            // print("id опонента $userId");
+          }
+        }
+      });
+    });
+    return getUserByUUID("oponentUUID");
+  }
+
+  User getUserByUUID(String uuid) {
+    //TODO затык
+    print("IN getUserByUUID");
+    var tmp = const User(
+        id: "0",
+        displayName: "Hardcoded name",
+        photoURL:
+            "https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png");
+
+    // usersRef.onValue.map((event) => print(event));
+
+    // usersRef.onValue.listen((e) {
+    //   final allFirebaseUsers =
+    //       Map<dynamic, dynamic>.from(e.snapshot.value as Map<dynamic, dynamic>);
+    //   print(allFirebaseUsers.keys);
+    // });
+
+    return tmp;
   }
 }

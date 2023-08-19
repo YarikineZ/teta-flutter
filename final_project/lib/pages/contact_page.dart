@@ -1,12 +1,18 @@
 ﻿import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 import '../models/user.dart';
+import '../services/realtime_db_servise.dart';
+import '../services/user_service.dart';
 import 'chat_page.dart';
 
 class ContactPage extends StatelessWidget {
   final User contact;
-  const ContactPage({super.key, required this.contact});
+  ContactPage({super.key, required this.contact});
+
+  final UserService userService = GetIt.I.get<UserService>();
+  final RealtimeDbService realtimeDbService = GetIt.I.get<RealtimeDbService>();
 
   @override
   Widget build(BuildContext context) {
@@ -21,9 +27,9 @@ class ContactPage extends StatelessWidget {
           Text("UUID: ${contact.id}"),
           TextButton(
               onPressed: () {
-                Navigator.of(context).push(CupertinoPageRoute(
-                    builder: ((context) =>
-                        ChatPage(pageTitle: contact.displayName))));
+                // Navigator.of(context).push(CupertinoPageRoute(
+                //     builder: ((context) => ChatPage(chat: contact))));
+                realtimeDbService.startNewChat(userService.user.id, contact.id);
               },
               child: const Text("Написать контакту")),
           TextButton(onPressed: () {}, child: const Text("Удалить контакт"))

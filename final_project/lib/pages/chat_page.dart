@@ -1,38 +1,34 @@
 ﻿import 'package:get_it/get_it.dart';
 import 'package:messenger/services/user_service.dart';
 
+import '../models/chat.dart';
 import '../models/message.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:string_to_hex/string_to_hex.dart';
 import 'package:flutter/material.dart';
 import 'package:messenger/services/realtime_db_servise.dart';
 
-class ChatPage extends StatefulWidget {
-  final String pageTitle;
-  const ChatPage({super.key, required this.pageTitle});
+import '../models/user.dart';
 
-  @override
-  State<ChatPage> createState() => _ChatPageState();
-}
+class ChatPage extends StatelessWidget {
+  final Chat chat;
+  const ChatPage({super.key, required this.chat});
 
-class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
-    var scaffold = Scaffold(
+    return Scaffold(
       appBar: AppBar(
-        title: Text(widget.pageTitle),
+        title: Text(chat.title),
       ),
-      body: const MessagesList(),
-      bottomSheet: const MyBottomSheet(),
+      body: MessagesList(chat: chat),
+      bottomSheet: MyBottomSheet(chat: chat),
     );
-    return scaffold;
   }
 }
 
 class MessagesList extends StatefulWidget {
-  const MessagesList({
-    super.key,
-  });
+  final Chat chat;
+  const MessagesList({super.key, required this.chat});
 
   @override
   State<MessagesList> createState() => _MessagesListState();
@@ -45,7 +41,7 @@ class _MessagesListState extends State<MessagesList> {
     final RealtimeDbService database = GetIt.I.get<RealtimeDbService>();
 
     return StreamBuilder(
-        stream: database.messagesStream(),
+        stream: database.allMessagesStream(widget.chat.id),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
@@ -59,7 +55,7 @@ class _MessagesListState extends State<MessagesList> {
           }
 
           return Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.fromLTRB(16.0, 10, 16.0, 80),
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 200),
                 switchInCurve: Curves.ease,
@@ -204,9 +200,9 @@ class MessageWidget extends StatelessWidget {
 }
 
 class MyBottomSheet extends StatefulWidget {
-  const MyBottomSheet({
-    super.key,
-  });
+  final Chat chat;
+
+  const MyBottomSheet({super.key, required this.chat});
 
   @override
   State<MyBottomSheet> createState() => _MyBottomSheetState();
@@ -233,30 +229,33 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _controller,
-              focusNode: myFocusNode,
-              style: const TextStyle(fontSize: 16.0),
-              decoration: const InputDecoration(
-                labelText: "Message",
-                border: OutlineInputBorder(),
-                floatingLabelBehavior: FloatingLabelBehavior.never,
+    return SizedBox(
+      height: 80,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _controller,
+                focusNode: myFocusNode,
+                style: const TextStyle(fontSize: 16.0),
+                decoration: const InputDecoration(
+                  labelText: "Message",
+                  // border: OutlineInputBorder(),
+                  // floatingLabelBehavior: FloatingLabelBehavior.never,
+                ),
               ),
             ),
-          ),
-          AnimatedSwitcher(
-              duration: const Duration(milliseconds: 200),
-              switchInCurve: Curves.ease,
-              transitionBuilder: (Widget child, Animation<double> animation) {
-                return ScaleTransition(scale: animation, child: child);
-              },
-              child: _isMic ? _micIcon() : _sendIcon())
-        ],
+            AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                switchInCurve: Curves.ease,
+                transitionBuilder: (Widget child, Animation<double> animation) {
+                  return ScaleTransition(scale: animation, child: child);
+                },
+                child: _isMic ? _micIcon() : _sendIcon())
+          ],
+        ),
       ),
     );
   }
@@ -280,7 +279,8 @@ class _MyBottomSheetState extends State<MyBottomSheet> {
       onPressed: () {
         myFocusNode.unfocus();
         _controller.text.isNotEmpty || _controller.text != ""
-            ? database.sendMessage(userService.user.id, _controller.text)
+            ? database.sendMessage(
+                userService.user.id, widget.chat.id, _controller.text)
             : null;
         _controller.text = "";
       },

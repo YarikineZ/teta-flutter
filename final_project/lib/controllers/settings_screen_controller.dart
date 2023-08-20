@@ -19,12 +19,16 @@ class SettingsScreenController extends StateNotifier<SettingsPageModel> {
 
   SettingsScreenController()
       : super(const SettingsPageModel(
-          userName: "No user name",
+          userName: "default USERNAME from contoller",
           avatarURL: "https://cdn-icons-png.flaticon.com/512/2202/2202112.png",
           isEdit: false,
           isSnackBar: false,
         ));
 
+  void dispose() {
+    textEditingController.dispose();
+    super.dispose();
+  }
   void edit() {
     state = state.copyWith(isEdit: true);
     textEditingController.text = userService.user.displayName;

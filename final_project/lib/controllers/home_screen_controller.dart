@@ -6,6 +6,11 @@ import 'package:firebase_auth/firebase_auth.dart' as fb hide PhoneAuthProvider;
 class HomeScreenController extends StateNotifier<HomePageModel> {
   HomeScreenController() : super(const HomePageModel(selectedIndex: 0));
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   void updateSelectedIndex(newIndex) {
     state = state.copyWith(selectedIndex: newIndex);
   }

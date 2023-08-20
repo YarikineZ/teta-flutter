@@ -14,6 +14,12 @@ class ContactsScreenController extends StateNotifier<ContactsPageModel> {
       : super(const ContactsPageModel(
             isAdding: false, isAddCintactButtonActive: false));
 
+  @override
+  void dispose() {
+    textEditingController.dispose();
+    super.dispose();
+  }
+
   void showAddContactWindow() {
     state = state.copyWith(isAdding: true);
   }

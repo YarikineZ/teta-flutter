@@ -7,7 +7,6 @@ import 'package:messenger/main.dart';
 import 'package:messenger/pages/contact_page.dart';
 
 import '../models/user.dart';
-import 'chat_page.dart';
 
 class ContactsPage extends ConsumerWidget {
   const ContactsPage({super.key});
@@ -114,7 +113,7 @@ class BottomAddContact extends ConsumerWidget {
                           .text
                           .isEmpty
                       ? Colors.grey
-                      : Color.fromARGB(255, 42, 98, 43),
+                      : const Color.fromARGB(255, 42, 98, 43),
                 )),
             TextButton(
               onPressed: ref

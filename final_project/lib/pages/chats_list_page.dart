@@ -6,7 +6,6 @@ import 'package:messenger/services/realtime_db_servise.dart';
 import 'package:messenger/services/user_service.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-import '../data/repository/user_repository.dart';
 import '../models/chat.dart';
 import '../models/user.dart';
 
@@ -51,7 +50,7 @@ class ChatsPage extends StatelessWidget {
 
 class ChatCard extends StatelessWidget {
   final Chat chat;
-  ChatCard({super.key, required this.chat});
+  const ChatCard({super.key, required this.chat});
 
   @override
   Widget build(BuildContext context) {

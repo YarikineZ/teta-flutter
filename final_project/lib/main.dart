@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb hide PhoneAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
+// import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:messenger/controllers/contacts_screen_controller.dart';
 import 'package:messenger/controllers/settings_screen_controller.dart';
 import 'package:messenger/data/repository/user_repository.dart';
@@ -11,7 +11,6 @@ import 'package:messenger/models/settings_page.dart';
 
 import 'package:messenger/services/storage_servise.dart';
 import 'package:messenger/services/user_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -46,7 +45,7 @@ final contactsScreeenProvider =
 
 Future<void> main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   final firebaseApp = await Firebase.initializeApp(
       name: 'aaa', options: DefaultFirebaseOptions.currentPlatform);
@@ -70,19 +69,17 @@ Future<void> main() async {
 
   final storage = StorageService();
   await storage.init(firebaseApp);
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
 
   // await FirebaseUIAuth.signOut(); //TODO DELL
 
   final getIt = GetIt.instance;
   getIt.registerSingleton<UserRepository>(repository);
   getIt.registerSingleton<StorageService>(storage);
-  getIt.registerSingleton<SharedPreferences>(prefs);
 
   UserService userService = UserService();
   getIt.registerSingleton<UserService>(userService);
 
-  FlutterNativeSplash.remove();
+  // FlutterNativeSplash.remove();
 
   runApp(
     const ProviderScope(

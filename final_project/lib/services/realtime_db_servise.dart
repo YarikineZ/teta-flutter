@@ -27,7 +27,6 @@ class RealtimeDbService {
   }
 
   Future sendMessage(userId, chatId, text) async {
-    //TODO чет ничего не понятно. Надо доделать
     var nowTime = DateTime.now().millisecondsSinceEpoch;
 
     final message = Message(userId: userId, text: text, timestamp: nowTime);

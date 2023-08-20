@@ -1,11 +1,9 @@
-﻿import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 import '../models/user.dart';
 import '../services/realtime_db_servise.dart';
 import '../services/user_service.dart';
-import 'chat_page.dart';
 
 class ContactPage extends StatelessWidget {
   final User contact;

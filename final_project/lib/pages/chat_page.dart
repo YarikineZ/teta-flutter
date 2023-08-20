@@ -8,8 +8,6 @@ import 'package:string_to_hex/string_to_hex.dart';
 import 'package:flutter/material.dart';
 import 'package:messenger/services/realtime_db_servise.dart';
 
-import '../models/user.dart';
-
 class ChatPage extends StatelessWidget {
   final Chat chat;
   const ChatPage({super.key, required this.chat});

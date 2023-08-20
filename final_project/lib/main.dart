@@ -3,19 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb hide PhoneAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 // import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:messenger/controllers/contacts_screen_controller.dart';
 import 'package:messenger/controllers/settings_screen_controller.dart';
+import 'controllers/home_screen_controller.dart';
+
 import 'package:messenger/data/repository/user_repository.dart';
 import 'package:messenger/models/settings_page.dart';
 
 import 'package:messenger/services/storage_servise.dart';
 import 'package:messenger/services/user_service.dart';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'firebase_options.dart';
 import 'package:get_it/get_it.dart';
+import 'models/home_page.dart';
 import 'models/contacts_page.dart';
 import 'pages/home_page.dart';
 
@@ -39,6 +41,13 @@ final settingsScreeenProvider =
 final contactsScreeenProvider =
     StateNotifierProvider<ContactsScreenController, ContactsPageModel>((ref) {
   final controller = ContactsScreenController();
+  ref.onDispose(() => controller.dispose());
+  return controller;
+});
+
+final homeScreeenProvider =
+    StateNotifierProvider<HomeScreenController, HomePageModel>((ref) {
+  final controller = HomeScreenController();
   ref.onDispose(() => controller.dispose());
   return controller;
 });

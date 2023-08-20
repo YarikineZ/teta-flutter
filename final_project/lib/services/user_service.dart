@@ -1,12 +1,16 @@
-﻿import 'package:get_it/get_it.dart';
+﻿import 'dart:async';
+
+import 'package:get_it/get_it.dart';
 import 'package:messenger/models/user.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'realtime_db_servise.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb hide PhoneAuthProvider;
 
 class UserService {
-  final RealtimeDbService database = GetIt.I.get<RealtimeDbService>();
+  final RealtimeDbService realtimeDbService = GetIt.I.get<RealtimeDbService>();
   late fb.User fbUser;
+  final StreamController<bool> _controller = StreamController<bool>();
+  late Stream<bool> isInited;
 
   late User user;
   final defaultAvatarURL =
@@ -29,37 +33,40 @@ class UserService {
     late String displayName;
     late String photoURL;
 
-    //TODO перевести проверку на realtime db
-    if (fbUser.displayName != null && fbUser.displayName!.isNotEmpty) {
-      displayName = fbUser.displayName!;
+    //Инициализируем пользователя после авторизации, еще не знаем
+    // DisplayName & photoURL. Ставим фиктивные
+    user = User(id: fbUser.uid, displayName: '0.001 sec', photoURL: "tmp");
+
+    User netUser = await realtimeDbService.getUserByUUID(fbUser.uid);
+
+    if (netUser.displayName.isNotEmpty) {
+      displayName = netUser.displayName;
     } else {
-      displayName = "no user name";
+      displayName = "no user name in db";
     }
 
-    if (fbUser.photoURL != null && fbUser.photoURL!.isNotEmpty) {
-      photoURL = fbUser.photoURL!;
+    if (netUser.photoURL.isNotEmpty) {
+      photoURL = netUser.photoURL;
     } else {
       photoURL = defaultAvatarURL;
     }
     user = User(id: fbUser.uid, displayName: displayName, photoURL: photoURL);
     saveUser();
+    isInited = _controller.stream.asBroadcastStream();
+    _controller.sink.add(true);
   }
 
   saveUser() async {
-    //так тут нужен  await или нет?
-    // await fbUser.updateDisplayName(user.displayName);
-    // await fbUser.updatePhotoURL(user.photoURL);
-
-    database.addOrUpdateUser(user.id, user.displayName, user.photoURL);
+    realtimeDbService.addOrUpdateUser(user.id, user.displayName, user.photoURL);
   }
 
   Future<void> setName(String newName) async {
     user = user.copyWith.call(displayName: newName);
-    database.addOrUpdateUser(user.id, user.displayName, user.photoURL);
+    realtimeDbService.addOrUpdateUser(user.id, user.displayName, user.photoURL);
   }
 
   Future<void> setAvatar(String newAvatarURL) async {
     user = user.copyWith.call(photoURL: newAvatarURL);
-    database.addOrUpdateUser(user.id, user.displayName, user.photoURL);
+    realtimeDbService.addOrUpdateUser(user.id, user.displayName, user.photoURL);
   }
 }

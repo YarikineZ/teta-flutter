@@ -13,7 +13,9 @@ class SettingsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pageController = ref.watch(settingsScreeenProvider);
-    // чтобы не писать as SettingsPageModel указал явный тип при инициализации провайдера ;
+    ref
+        .read(settingsScreeenProvider.notifier)
+        .updateStateAfterUserServiceInit();
 
     return Scaffold(
       appBar: AppBar(

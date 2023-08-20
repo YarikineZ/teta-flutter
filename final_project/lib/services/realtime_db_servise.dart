@@ -197,26 +197,26 @@ class RealtimeDbService {
         }
       });
     });
-    return getUserByUUID("oponentUUID");
+    return getHardUserByUUID("oponentUUID");
   }
 
-  User getUserByUUID(String uuid) {
+  User getHardUserByUUID(String uuid) {
     //TODO затык
-    print("IN getUserByUUID");
-    var tmp = const User(
+    return const User(
         id: "0",
         displayName: "Hardcoded name",
         photoURL:
             "https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png");
+  }
 
-    // usersRef.onValue.map((event) => print(event));
+  //Использую для поиска сохраненной информации о пользователе
+  // в базе при инициализации экрана settings после логина
+  Future<User> getUserByUUID(String uuid) async {
+    final snap = await usersRef.child(uuid).get();
+    var userJson =
+        Map<String, dynamic>.from(snap.value as Map<dynamic, dynamic>);
+    var user = User.fromJson(userJson);
 
-    // usersRef.onValue.listen((e) {
-    //   final allFirebaseUsers =
-    //       Map<dynamic, dynamic>.from(e.snapshot.value as Map<dynamic, dynamic>);
-    //   print(allFirebaseUsers.keys);
-    // });
-
-    return tmp;
+    return user;
   }
 }

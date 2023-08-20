@@ -1,4 +1,6 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'dart:async';
+
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -14,6 +16,7 @@ class SettingsScreenController extends StateNotifier<SettingsPageModel> {
   final TextEditingController textEditingController = TextEditingController();
   final UserService userService = GetIt.I.get<UserService>();
   final StorageService storage = GetIt.I.get<StorageService>();
+  late StreamSubscription<bool> subscription;
 
   // SettingsScreenController(super.state); // требует начальных параметров при инициализацити
 
@@ -25,10 +28,26 @@ class SettingsScreenController extends StateNotifier<SettingsPageModel> {
           isSnackBar: false,
         ));
 
+  @override
   void dispose() {
     textEditingController.dispose();
     super.dispose();
   }
+
+  updateStateAfterUserServiceInit() {
+    subscription = userService.isInited.listen((e) => {
+          //TODO добавить диспос
+          if (e)
+            {
+              state = state.copyWith(
+                userName: userService.user.displayName,
+                avatarURL: userService.user.photoURL,
+              ),
+              subscription.cancel()
+            }
+        });
+  }
+
   void edit() {
     state = state.copyWith(isEdit: true);
     textEditingController.text = userService.user.displayName;

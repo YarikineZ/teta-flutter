@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../main.dart';
@@ -52,15 +53,15 @@ class SettingsPage extends ConsumerWidget {
                     ))
                 : Text(pageController.userName),
             TextButton(
-              onPressed: () => Navigator.pushNamed(
-                  context, '/phone'), //TODO Add sign out from firebase
-              child: const Text("Sign Out"),
-            ),
+                onPressed: () async => {
+                      await FirebaseUIAuth.signOut(),
+                      Navigator.pushNamed(context, '/phone')
+                    },
+                child: const Text("Sign Out")),
             TextButton(
-              onPressed: () =>
-                  ref.read(settingsScreeenProvider.notifier).copyUUID(),
-              child: const Text("Copy my UUID"),
-            ),
+                onPressed: () =>
+                    ref.read(settingsScreeenProvider.notifier).copyUUID(),
+                child: const Text("Copy my UUID")),
           ],
         ),
       ),

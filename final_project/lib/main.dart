@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb hide PhoneAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:messenger/controllers/contacts_screen_controller.dart';
 import 'package:messenger/controllers/settings_screen_controller.dart';
 import 'package:messenger/data/repository/user_repository.dart';
@@ -44,7 +45,8 @@ final contactsScreeenProvider =
 });
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   final firebaseApp = await Firebase.initializeApp(
       name: 'aaa', options: DefaultFirebaseOptions.currentPlatform);
 
@@ -78,6 +80,8 @@ Future<void> main() async {
 
   UserService userService = UserService();
   getIt.registerSingleton<UserService>(userService);
+
+  FlutterNativeSplash.remove();
 
   runApp(
     const ProviderScope(

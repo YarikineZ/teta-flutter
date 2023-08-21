@@ -20,7 +20,7 @@ class ChatsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Contacts"),
+        title: const Text("Chats"),
       ),
       body: StreamBuilder(
           stream: realtimeDbService.myChatsStream(userService.user.id),

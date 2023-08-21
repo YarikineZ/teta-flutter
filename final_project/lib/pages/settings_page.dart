@@ -41,24 +41,25 @@ class SettingsPage extends ConsumerWidget {
                     ? ref.read(settingsScreeenProvider.notifier).pickImage()
                     : null,
                 child: CircleAvatar(
-                    radius: 32,
-                    child: Image.network(pageController.avatarURL,
-                        // scale: 0.71, //чтобы картинка вмещалась в круг. Не работает
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Text("ERR"),
-                        loadingBuilder: (context, Widget widget,
-                            ImageChunkEvent? loadingProgress) {
-                          if (loadingProgress == null) {
-                            return widget;
-                          }
-                          return Center(
-                              child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                                : null,
-                          ));
-                        }))),
+                  radius: 32,
+                  backgroundImage: Image.network(pageController.avatarURL,
+                      fit: BoxFit.fill,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const Text("ERR"),
+                      loadingBuilder: (context, Widget widget,
+                          ImageChunkEvent? loadingProgress) {
+                        if (loadingProgress == null) {
+                          return widget;
+                        }
+                        return Center(
+                            child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                              : null,
+                        ));
+                      }).image,
+                )),
             const SizedBox(height: 32.0),
             pageController.isEdit
                 ? Padding(

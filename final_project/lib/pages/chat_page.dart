@@ -1,6 +1,7 @@
 ﻿import 'package:get_it/get_it.dart';
 import 'package:messenger/services/user_service.dart';
 
+import '../data/repository/user_repository.dart';
 import '../models/chat.dart';
 import '../models/message.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -12,11 +13,36 @@ class ChatPage extends StatelessWidget {
   final Chat chat;
   const ChatPage({super.key, required this.chat});
 
+  final defaultAvatarURL =
+      "https://cdn-icons-png.flaticon.com/512/2202/2202112.png";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(chat.title),
+        title: Row(
+          children: [
+            CircleAvatar(
+                backgroundImage: Image.network(defaultAvatarURL,
+                    fit: BoxFit.fill,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const Text("ERR"),
+                    loadingBuilder: (context, Widget widget,
+                        ImageChunkEvent? loadingProgress) {
+                      if (loadingProgress == null) {
+                        return widget;
+                      }
+                      return Center(
+                          child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                            : null,
+                      ));
+                    }).image),
+            Text(chat.title),
+          ],
+        ),
       ),
       body: MessagesList(chat: chat),
       bottomSheet: MyBottomSheet(chat: chat),
@@ -150,42 +176,49 @@ class _MessagesShimmerState extends State<MessagesShimmer>
 }
 
 class MessageWidget extends StatelessWidget {
+  final UserService userService = GetIt.I.get<UserService>();
   final Message message;
 
-  const MessageWidget({super.key, required this.message});
+  MessageWidget({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 16),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: message.userId == userService.user.id
+            ? CrossAxisAlignment.end
+            : CrossAxisAlignment.start,
         children: [
-          Row(children: [
-            Text(
-              message.userId,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Color(
-                  StringToHex.toColor(
-                    message.userId,
+          Row(
+              mainAxisAlignment: message.userId == userService.user.id
+                  ? MainAxisAlignment.end
+                  : MainAxisAlignment.start,
+              children: [
+                Text(
+                  message.userId,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Color(
+                      StringToHex.toColor(
+                        message.userId,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Text(
-              timeago.format(
-                DateTime.fromMillisecondsSinceEpoch(
-                  message.timestamp,
-                ),
-              ),
-              style: const TextStyle(
-                  fontWeight: FontWeight.w400,
-                  color: Colors.black38,
-                  fontSize: 13.0),
-            )
-          ]),
+                const SizedBox(width: 6),
+                Text(
+                  timeago.format(
+                    DateTime.fromMillisecondsSinceEpoch(
+                      message.timestamp,
+                    ),
+                  ),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black38,
+                      fontSize: 13.0),
+                )
+              ]),
           const SizedBox(height: 8),
           Text(
             message.text,

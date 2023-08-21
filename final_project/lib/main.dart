@@ -79,7 +79,7 @@ Future<void> main() async {
   final storage = StorageService();
   await storage.init(firebaseApp);
 
-  // await FirebaseUIAuth.signOut(); //TODO DELL
+  await FirebaseUIAuth.signOut(); //TODO DELL
 
   final getIt = GetIt.instance;
   getIt.registerSingleton<UserRepository>(repository);

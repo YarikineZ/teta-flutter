@@ -211,12 +211,15 @@ class RealtimeDbService {
 
   //Использую для поиска сохраненной информации о пользователе
   // в базе при инициализации экрана settings после логина
-  Future<User> getUserByUUID(String uuid) async {
+  Future? getUserByUUID(String uuid) async {
     final snap = await usersRef.child(uuid).get();
-    var userJson =
-        Map<String, dynamic>.from(snap.value as Map<dynamic, dynamic>);
-    var user = User.fromJson(userJson);
-
-    return user;
+    if (snap.exists) {
+      var userJson =
+          Map<String, dynamic>.from(snap.value as Map<dynamic, dynamic>);
+      var user = User.fromJson(userJson);
+      return user;
+    } else {
+      return null;
+    }
   }
 }

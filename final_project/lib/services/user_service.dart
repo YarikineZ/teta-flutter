@@ -37,15 +37,15 @@ class UserService {
     // DisplayName & photoURL. Ставим фиктивные
     user = User(id: fbUser.uid, displayName: '0.001 sec', photoURL: "tmp");
 
-    User netUser = await realtimeDbService.getUserByUUID(fbUser.uid);
+    User? netUser = await realtimeDbService.getUserByUUID(fbUser.uid);
 
-    if (netUser.displayName.isNotEmpty) {
+    if (netUser != null && netUser.displayName.isNotEmpty) {
       displayName = netUser.displayName;
     } else {
       displayName = "no user name in db";
     }
 
-    if (netUser.photoURL.isNotEmpty) {
+    if (netUser != null && netUser.photoURL.isNotEmpty) {
       photoURL = netUser.photoURL;
     } else {
       photoURL = defaultAvatarURL;

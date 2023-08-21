@@ -32,6 +32,7 @@ class ContactsScreenController extends StateNotifier<ContactsPageModel> {
     if (textEditingController.text.isNotEmpty) {
       realtimeDbService.addContact(
           userService.user.id, textEditingController.text);
+      state = state.copyWith(isAdding: false);
     }
   }
 

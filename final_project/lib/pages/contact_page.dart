@@ -18,7 +18,25 @@ class ContactPage extends StatelessWidget {
       appBar: AppBar(title: const Text("Contact")),
       body: Center(
         child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-          CircleAvatar(radius: 32, child: Image.network(contact.photoURL)),
+          CircleAvatar(
+            radius: 32,
+            backgroundImage: Image.network(contact.photoURL,
+                fit: BoxFit.fill,
+                errorBuilder: (context, error, stackTrace) => const Text("ERR"),
+                loadingBuilder:
+                    (context, Widget widget, ImageChunkEvent? loadingProgress) {
+                  if (loadingProgress == null) {
+                    return widget;
+                  }
+                  return Center(
+                      child: CircularProgressIndicator(
+                    value: loadingProgress.expectedTotalBytes != null
+                        ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes!
+                        : null,
+                  ));
+                }).image,
+          ),
           const SizedBox(height: 32.0),
           Text(contact.displayName),
           const SizedBox(height: 32.0),

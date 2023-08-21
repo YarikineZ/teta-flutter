@@ -64,7 +64,24 @@ class UserCardWidget extends StatelessWidget {
       children: [
         const Divider(height: 0),
         ListTile(
-          leading: CircleAvatar(child: Image.network(user.photoURL)),
+          leading: CircleAvatar(
+            backgroundImage: Image.network(user.photoURL,
+                fit: BoxFit.fill,
+                errorBuilder: (context, error, stackTrace) => const Text("ERR"),
+                loadingBuilder:
+                    (context, Widget widget, ImageChunkEvent? loadingProgress) {
+                  if (loadingProgress == null) {
+                    return widget;
+                  }
+                  return Center(
+                      child: CircularProgressIndicator(
+                    value: loadingProgress.expectedTotalBytes != null
+                        ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes!
+                        : null,
+                  ));
+                }).image,
+          ),
           title: Text(user.displayName),
           onTap: () {
             Navigator.of(context).push(CupertinoPageRoute(
@@ -102,9 +119,8 @@ class BottomAddContact extends ConsumerWidget {
               ),
             ),
             TextButton(
-                onPressed: pageController.isAddCintactButtonActive
-                    ? ref.read(contactsScreeenProvider.notifier).addContact
-                    : null,
+                onPressed:
+                    ref.read(contactsScreeenProvider.notifier).addContact,
                 child: Icon(
                   Icons.add_rounded,
                   color: ref

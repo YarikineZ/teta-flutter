@@ -1,7 +1,6 @@
 ﻿import 'package:get_it/get_it.dart';
 import 'package:messenger/services/user_service.dart';
 
-import '../data/repository/user_repository.dart';
 import '../models/chat.dart';
 import '../models/message.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -59,9 +58,10 @@ class MessagesList extends StatefulWidget {
 }
 
 class _MessagesListState extends State<MessagesList> {
-  late bool _isShimmer;
   @override
   Widget build(BuildContext context) {
+    late bool _isShimmer;
+
     final RealtimeDbService database = GetIt.I.get<RealtimeDbService>();
 
     return StreamBuilder(

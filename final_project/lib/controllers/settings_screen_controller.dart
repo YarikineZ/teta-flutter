@@ -31,12 +31,12 @@ class SettingsScreenController extends StateNotifier<SettingsPageModel> {
   @override
   void dispose() {
     textEditingController.dispose();
+    subscription.cancel();
     super.dispose();
   }
 
   updateStateAfterUserServiceInit() {
     subscription = userService.isInited.listen((e) => {
-          //TODO добавить диспос
           if (e)
             {
               state = state.copyWith(
